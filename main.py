@@ -1,4 +1,3 @@
-import concurrent.futures
 import os
 import threading
 from time import perf_counter
@@ -79,12 +78,10 @@ def writeallseason(year, sprinttype):
     - Cars
     - Weather
     """
-    pool = concurrent.futures.ThreadPoolExecutor(max_workers=6)
-    pool.submit(fw.writecsv(f'Schedule_{year}', mif.loadschedule(year)))
-    pool.submit(maf.writeseasoncardata(year, sprinttype))
-    pool.submit(maf.writeseasonlapdata(year, sprinttype))
-    pool.submit(maf.writeseasonweatherdata(year, sprinttype))
-    pool.shutdown(wait=True)
+    fw.writecsv(f'Schedule_{year}', mif.loadschedule(year))
+    maf.writeseasoncardata(year, sprinttype)
+    maf.writeseasonlapdata(year, sprinttype)
+    maf.writeseasonweatherdata(year, sprinttype)
     print("Done")
 
 
@@ -95,9 +92,15 @@ if __name__ == "__main__":
     
     year, lstyear = 2023, []
     sprinttype = ['FP1', 'FP2', 'FP3', 'Q', 'R']
-    while year >= 2016: # 1950
+
+    # WARNING: Hard limit for data is 2018
+    while year >= 2018: # 1950
         print(f'\n\n{year}')
         writeallseason(year, sprinttype[4])
+        year -= 1
+
+    while year >= 1950:
+        fw.writecsv(f'Schedule_{year}', mif.loadschedule(year))
         year -= 1
 
     # TODO: SESSION.POS_DATA
