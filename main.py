@@ -7,6 +7,7 @@ import pandas as pd
 
 import filewriters as fw
 import macrofunctions as maf
+import megafunctions as mef
 import microfunctions as mif
 
 mif.fastf1.plotting.setup_mpl()
@@ -71,7 +72,7 @@ def writeallsingle(session, year):
     fw.writecsv('session_results', session.results) # writes session results
 
 
-def writeallseason(year):
+def writeallseason(year, sprinttype):
     """
     TODO: BESCHRIJVING
     - Laps
@@ -82,31 +83,38 @@ def writeallseason(year):
     pool.submit(fw.writecsv(f'Schedule_{year}', mif.loadschedule(year)))
     pool.submit(maf.writeseasoncardata(year, sprinttype))
     pool.submit(maf.writeseasonlapdata(year, sprinttype))
+    pool.submit(maf.writeseasonweatherdata(year, sprinttype))
     pool.shutdown(wait=True)
     print("Done")
 
 
 if __name__ == "__main__":
-    year, location, sprinttype = 2021, 'monza', 'R'
+    # TODO: Write files to dedicated maps
+    project_root_dir = os.path.dirname(os.path.abspath(__file__))
+    _datamap = os.path.join(project_root_dir, 'Data/Macrodata/cardata_2022.csv')
     
-    # ONE SESSION
-    print("\x1b[32m")
-    session = mif.loadsession(year, location, sprinttype)  # Requests the session
-    print("\x1b[0m")
+    year, lstyear = 2023, []
+    sprinttype = ['FP1', 'FP2', 'FP3', 'Q', 'R']
+    while year >= 2016: # 1950
+        print(f'\n\n{year}')
+        writeallseason(year, sprinttype[4])
+        year -= 1
 
     # TODO: SESSION.POS_DATA
 
-    starttijd = perf_counter()
-    # maf.cacheall(year, sprinttype)
-    print(f" Tijd: \x1b[31m{(perf_counter() - starttijd) * 1000:.0f}ms\x1b[32m)")
-
     # THE WHOLE SEASON
-    writeallseason(year)
-    
+    # writeallseason(year, sprinttype[4])
     pass
 
+    # ALL AVAILABLE FROM 2023-1950
+    # mef.writealldata(year, sprinttype[4])
+    pass
 
     # WRITE ONE SESSION
+    year, location = 2018, 'monza'
+    print("\x1b[32m")
+    # session = mif.loadsession(year, location, sprinttype[4])  # Requests the session
+    print("\x1b[0m")
     # writeallsingle(session, year)
 
     # deleteall()
