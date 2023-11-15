@@ -1,14 +1,46 @@
-import pandas as pd
-import filewriters as fw
-import loaders as l
-import macrofunctions as mf
-from time import perf_counter
+import concurrent.futures
 import os
+import threading
+from time import perf_counter
 
-l.fastf1.plotting.setup_mpl()
+import pandas as pd
+
+import filewriters as fw
+import macrofunctions as maf
+import microfunctions as mif
+
+mif.fastf1.plotting.setup_mpl()
+
+
+def deleteall():
+    """
+    TODO: kan ik relatieve paden gebruiken?
+
+    Deletes all csv-files in the given directory
+    """
+    directory_path = '/Users/delano/Documents/GitHub/Data_Drivers'
+    bestanden = os.listdir(directory_path)
+    csv_bestanden = [
+        bestand for bestand in bestanden if bestand.endswith('.csv')]
+    for csv_bestand in csv_bestanden:
+        bestand_pad = os.path.join(directory_path, csv_bestand)
+        os.remove(bestand_pad)
+        print(f'{csv_bestand} is verwijderd.')
+    print('Alle CSV-bestanden zijn verwijderd.')
 
 
 def circuit_info(session):
+    """
+    Requests all available information regarding a circuit via FastF1.
+
+    Args:
+    - session
+    
+    Result
+    - CSV-file: Containing cornerinfo.
+    - CSV-File: Containing marshallights.
+    - CSV-File: Containing marshal sectors.
+    """
     circuit_info = session.get_circuit_info()  # VRAAG: is dit een kaart?
     try:
         fw.writecsv('ci_cornerinfo', circuit_info.corners)
@@ -22,75 +54,61 @@ def writeallsingle(session, year):
     """
     Schrijft alles gedefinieerd naar csv.
 
+    Args
+    - session
+    - year
+
     Result
     - CSV-bestanden van alles gedefinieerd, waaronder telemetries; etc.
     """
-    fw.writecsv(f'schedule_{year}', l.loadschedule(year)) # Writes the schedule of the given year
+    fw.writecsv(f'schedule_{year}', mif.loadschedule(year))  # Writes the schedule of the given year
     circuit_info(session) # Writes available circuit information containing cornering; marshals.
-    fw.writecsv("lapdata", mf.alllapdata(session)) # Writes all available lap data of the requested session
-    fw.writecsv("cardata", mf.allcardata(session)) # Writes all available car data of the requested session
-    fw.writecsv('remaining_sessions', l.loadremaining()) # Writes the remaining sessions of the season
-    fw.writecsv('weather_data', session.weather_data) # Writes weather data
+    fw.writecsv("lapdata", maf.alllapdata(year, session)) # Writes all available lap data of the requested session
+    fw.writecsv("cardata", maf.allcardata(year, session)) # Writes all available car data of the requested session
+    fw.writecsv('remaining_sessions', mif.loadremaining()) # Writes the remaining sessions of the season
+    fw.writecsv('weather_data', session.weather_data)  # Writes weather data
     fw.writecsv('track_status', session.track_status) # Writes track status which contains green; yellow flags; safety cars
-
-    # SESSION RESULTS
-    fw.writecsv('session_results', session.results)
+    fw.writecsv('session_results', session.results) # writes session results
 
 
 def writeallseason(year):
     """
+    TODO: BESCHRIJVING
     - Laps
     - Cars
     - Weather
     """
-    # CARDATA
-    try:
-        fw.writecsv(f'cardata_{year}', mf.seasoncardata(year, sprinttype))
-    except UnboundLocalError as ule:
-        print(f"\x1b[31m{ule}\x1b[0m")
-    pass
+    pool = concurrent.futures.ThreadPoolExecutor(max_workers=6)
+    pool.submit(fw.writecsv(f'Schedule_{year}', mif.loadschedule(year)))
+    pool.submit(maf.writeseasoncardata(year, sprinttype))
+    pool.submit(maf.writeseasonlapdata(year, sprinttype))
+    pool.shutdown(wait=True)
+    print("Done")
 
-    # LAPDATA
-    try:
-        fw.writecsv(f'lapdata_{year}', mf.seasonlapdata(year, sprinttype))
-    except UnboundLocalError as ule:
-        print(f"\x1b[31m{ule}\x1b[0m")
-    pass
-
-
-"""
-TODO's:
-- DONE: Load a session with given parameters, which can call other actions.
-- DONE: Race Schedule for a given season.
-- DONE: Remaining Races given the latest season.
-- DONE: Aquire lap data to which information as position and laptimes are given.
-- DONE: An aggregated list of car data per lap per driver.
-- DONE: Acquire weather data of the given session.
-- TODO: Write all available data iteratively to csv.
-- TODO: Match all columns with obtained datasets via ergast.
-"""
 
 if __name__ == "__main__":
-    year, location, sprinttype = 2023, 'monza', 'R'
-
-    # THE WHOLE SEASON
-    gocache = 'n'
-    if gocache == 'j':
-        try:
-            starttijd = perf_counter()
-            mf.cacheall(year)
-            print(f" Tijd: \x1b[31m{(perf_counter() - starttijd) * 1000:.0f}ms\x1b[32m)")
-        except:
-            pass
-    writeallseason(year)
+    year, location, sprinttype = 2021, 'monza', 'R'
     
     # ONE SESSION
     print("\x1b[32m")
-    session = l.loadsession(year, location, sprinttype)  # Requests the session
+    session = mif.loadsession(year, location, sprinttype)  # Requests the session
     print("\x1b[0m")
 
-    # WRITE ONE SESSION
-    writeallsingle(session, year)
+    # TODO: SESSION.POS_DATA
 
+    starttijd = perf_counter()
+    # maf.cacheall(year, sprinttype)
+    print(f" Tijd: \x1b[31m{(perf_counter() - starttijd) * 1000:.0f}ms\x1b[32m)")
+
+    # THE WHOLE SEASON
+    writeallseason(year)
+    
+    pass
+
+
+    # WRITE ONE SESSION
+    # writeallsingle(session, year)
+
+    # deleteall()
 
 # l.fastf1.Cache.clear_cache()

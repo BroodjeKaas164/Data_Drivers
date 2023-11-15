@@ -2,16 +2,5 @@
 /__pycache__
 /.idea
 /.vscode
-/lap_data.csv
-/remaining_sessions.csv
-/schedule_2021.csv
-/schedule_2022.csv
-/schedule_2023.csv
-/car_data.csv
-/weather_data.csv
-/track_status.csv
-/session_results.csv
-/ci_cornerinfo.csv
-/ci_marshallights.csv
-/ci_marshalsectors.csv
 /Data/
+/todos.txt
