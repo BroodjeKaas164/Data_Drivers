@@ -24,8 +24,8 @@ def allcardata(name, year, session, combinedcardata=[]):
     try:
         for driver in session.drivers:
             lap = 1
-            while lap <= session.total_laps:
-                try:
+            try:
+                while lap <= session.total_laps:
                     lstdriver, lstyear, lstname, x = [], [], [], 1
                     df = session.laps.pick_driver(driver).pick_lap(int(lap)).get_car_data()
                     while x <= df.Brake.size:
@@ -37,14 +37,18 @@ def allcardata(name, year, session, combinedcardata=[]):
                     df['year'] = lstyear
                     df['gp'] = lstname
                     combinedcardata.append(df)
-                except KeyError as ke:
-                    print(f"\x1b[31m{ke}\x1b[0m")
-                except ValueError as ve:
-                    print(f"\x1b[31m{ve}\x1b[0m")
-                lap += 1
+            except KeyError as ke:
+                print(f"\x1b[31m{ke}\x1b[0m")
+            except ValueError as ve:
+                print(f"\x1b[31m{ve}\x1b[0m")
+            except:
+                pass
+            lap += 1
+        return pd.concat(combinedcardata)
     except AttributeError as ae:
         print(f"\x1b[31m{ae}\x1b[0m")
-    return pd.concat(combinedcardata)
+    except ValueError as ve:
+        print(f"\x1b[31m{ve}\x1b[0m")
 
 
 def seasoncardata(year, sessiontype, eventiter=0):
@@ -114,9 +118,11 @@ def alllapdata(name, year, session, lap=1, combinedlapdata=[]):
                 print(f"\x1b[31m{ve}\x1b[0m")
             combinedlapdata.append(lapinfo)
             lap += 1
+        return pd.concat(combinedlapdata)
     except AttributeError as ae:
         print(f"\x1b[31m{ae}\x1b[0m")
-    return pd.concat(combinedlapdata)
+    except:
+        print("SOMETHING WENT WRONG")
 
 
 def seasonlapdata(year, sessiontype, eventiter=0, combinedlap=[]):
@@ -201,9 +207,11 @@ def allweatherdata(name, year, session, combinedweatherdata=[]):
                 except ValueError as ve:
                     print(f"\x1b[31m{ve}\x1b[0m")
                 lap += 1
+        return pd.concat(combinedweatherdata)
     except AttributeError as ae:
         print(f"\x1b[31m{ae}\x1b[0m")
-    return pd.concat(combinedweatherdata)
+    except:
+        print("SOMETHING WENT WRONG")
 
 
 def seasonweatherdata(year, sessiontype, eventiter=0):
