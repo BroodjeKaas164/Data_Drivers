@@ -6,7 +6,6 @@ import pandas as pd
 
 import filewriters as fw
 import macrofunctions as maf
-import megafunctions as mef
 import microfunctions as mif
 
 mif.fastf1.plotting.setup_mpl()
@@ -20,8 +19,7 @@ def deleteall():
     """
     directory_path = '/Users/delano/Documents/GitHub/Data_Drivers'
     bestanden = os.listdir(directory_path)
-    csv_bestanden = [
-        bestand for bestand in bestanden if bestand.endswith('.csv')]
+    csv_bestanden = [bestand for bestand in bestanden if bestand.endswith('.csv')]
     for csv_bestand in csv_bestanden:
         bestand_pad = os.path.join(directory_path, csv_bestand)
         os.remove(bestand_pad)
@@ -55,8 +53,8 @@ def writeallsingle(session, year):
     Schrijft alles gedefinieerd naar csv.
 
     Args
-    - session
-    - year
+    - session (DataFrame)
+    - year (int/str)
 
     Result
     - CSV-bestanden van alles gedefinieerd, waaronder telemetries; etc.
@@ -78,7 +76,6 @@ def writeallseason(year, sprinttype):
     - Cars
     - Weather
     """
-    fw.writecsv(f'Schedule_{year}', mif.loadschedule(year))
     maf.writeseasoncardata(year, sprinttype)
     maf.writeseasonlapdata(year, sprinttype)
     maf.writeseasonweatherdata(year, sprinttype)
@@ -90,28 +87,32 @@ if __name__ == "__main__":
     project_root_dir = os.path.dirname(os.path.abspath(__file__))
     _datamap = os.path.join(project_root_dir, 'Data/Macrodata/cardata_2022.csv')
     
-    year, lstyear = 2023, []
+    yearsession, yearschedule, lstyear = 2023, 2023, []
     sprinttype = ['FP1', 'FP2', 'FP3', 'Q', 'R']
 
     # WARNING: Hard limit for data is 2018
-    while year >= 2018: # 1950
-        print(f'\n\n{year}')
-        writeallseason(year, sprinttype[4])
-        year -= 1
+    while yearsession >= 2018: # 1950
+        print(f'\n\n{yearsession}')
+        writeallseason(yearsession, sprinttype[4])
+        yearsession -= 1
 
-    while year >= 1950:
-        fw.writecsv(f'Schedule_{year}', mif.loadschedule(year))
-        year -= 1
+    while yearschedule >= 1950:
+        print(f'\n\n{yearschedule}')
+        fw.writecsv(f'schedule_{yearschedule}', mif.loadschedule(yearschedule))
+        yearschedule -= 1
+
+    # Iterative reading per file and bulkwrite to one
+    starttijd = perf_counter()
+    try:
+        fw.writecsv('cardata_master', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(project_root_dir) if bestand.endswith('.csv') and bestand.startswith('cardata')]))
+        fw.writecsv('lapdata_master', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(project_root_dir) if bestand.endswith('.csv') and bestand.startswith('lapdata')]))
+        fw.writecsv('weatherdata_master', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(project_root_dir) if bestand.endswith('.csv') and bestand.startswith('weatherdata')]))
+        fw.writecsv('schedule_master', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(project_root_dir) if bestand.endswith('.csv') and bestand.startswith('schedule')]))
+    except:
+        pass
+    print(f"Tijd: \x1b[31m{(perf_counter() - starttijd) * 1000:.0f}ms")
 
     # TODO: SESSION.POS_DATA
-
-    # THE WHOLE SEASON
-    # writeallseason(year, sprinttype[4])
-    pass
-
-    # ALL AVAILABLE FROM 2023-1950
-    # mef.writealldata(year, sprinttype[4])
-    pass
 
     # WRITE ONE SESSION
     year, location = 2018, 'monza'
