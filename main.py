@@ -86,36 +86,36 @@ def writeallseason(year, sprinttype, lstcardata=[], lstlapdata=[], lstweatherdat
         session = mif.loadsession(year, track, sprinttype)
         try:
             if session.session_info['Meeting']['OfficialName'] == track:
-                try:
-                    pd.read_csv(f'cardata_{year}.csv')
-                    print(f'cardata_{year}.csv exists')
-                except FileNotFoundError:
-                    lstcardata.append(maf.writeseasoncardata(track, session, year, sprinttype).drop_duplicates())
-                    print('cardata retrieved')
-                try:
-                    pd.read_csv(f'lapdata_{year}.csv')
-                    print(f'lapdata_{year}.csv exists')
-                except FileNotFoundError:
-                    lstlapdata.append(maf.writeseasonlapdata(track, session, year, sprinttype).drop_duplicates())
-                    print('lapdata retrieved')
-                try:
-                    pd.read_csv(f'weatherdata_{year}.csv')
-                    print(f'weatherdata_{year}.csv exists')
-                except FileNotFoundError:
-                    lstweatherdata.append(maf.writeseasonweatherdata(track, session, year, sprinttype).drop_duplicates())
-                    print('weatherdata retrieved')
+                lstcardata.append(maf.writeseasoncardata(track, session, year, sprinttype).drop_duplicates())
+                print('cardata retrieved')
+                lstlapdata.append(maf.writeseasonlapdata(track, session, year, sprinttype).drop_duplicates())
+                print('lapdata retrieved')
+                lstweatherdata.append(maf.writeseasonweatherdata(track, session, year, sprinttype).drop_duplicates())
+                print('weatherdata retrieved')
         except AttributeError as ae:
             print(f'\x1b[31m{ae}\x1b[0m')
-    _lstcardata = pd.concat(lstcardata).drop_duplicates()
-    _lstlapdata = pd.concat(lstlapdata).drop_duplicates()
-    _lstweatherdata = pd.concat(lstweatherdata).drop_duplicates()
     print('\n\n\nData is being written, it will take a while...')
-    fw.writecsv(f'cardata_{year}', _lstcardata)
-    print('cardata written...')
-    fw.writecsv(f'lapdata_{year}', _lstlapdata)
-    print('lapdata written...')
-    fw.writecsv(f'weatherdata_{year}', _lstweatherdata)
-    print('weatherdata written...')
+    try:
+        pd.read_csv(f'cardata_{year}.csv')
+        print(f'cardata_{year}.csv exists')
+    except FileNotFoundError:
+        _lstcardata = pd.concat(lstcardata).drop_duplicates()
+        fw.writecsv(f'cardata_{year}', _lstcardata)
+        print('cardata written...')
+    try:
+        pd.read_csv(f'lapdata_{year}.csv')
+        print(f'lapdata_{year}.csv exists')
+    except FileNotFoundError:
+        _lstlapdata = pd.concat(lstlapdata).drop_duplicates()
+        fw.writecsv(f'lapdata_{year}', _lstlapdata)
+        print('lapdata written...')
+    try:
+        pd.read_csv(f'weatherdata_{year}.csv')
+        print(f'weatherdata_{year}.csv exists')
+    except FileNotFoundError:
+        _lstweatherdata = pd.concat(lstweatherdata).drop_duplicates()
+        fw.writecsv(f'weatherdata_{year}', _lstweatherdata)
+        print('weatherdata written...')
     print("Season written")
 
 
