@@ -69,17 +69,42 @@ def writeallsingle(session, year):
     fw.writecsv('session_results', session.results) # writes session results
 
 
-def writeallseason(year, sprinttype):
+def writeallseason(year, sprinttype, lstcardata=[], lstlapdata=[], lstweatherdata=[]):
     """
     TODO: BESCHRIJVING
     - Laps
     - Cars
     - Weather
     """
-    maf.writeseasoncardata(year, sprinttype)
-    maf.writeseasonlapdata(year, sprinttype)
-    maf.writeseasonweatherdata(year, sprinttype)
-    print("Done")
+    """
+    fw.writecsv(f'cardata_{year}', pd.concat([maf.writeseasoncardata(track, mif.loadsession(year, track, sprinttype), year, sprinttype) for track in mif.loadschedule(year).OfficialEventName if mif.loadsession(year, track, sprinttype).session_info['Meeting']['OfficialName'] == track]))
+    fw.writecsv(f'lapdata_{year}', pd.concat([maf.writeseasonlapdata(track, mif.loadsession(year, track, sprinttype), year, sprinttype) for track in mif.loadschedule(year).OfficialEventName if mif.loadsession(year, track, sprinttype).session_info['Meeting']['OfficialName'] == track]))
+    fw.writecsv(f'weatherdata_{year}', pd.concat([maf.writeseasonweatherdata(track, mif.loadsession(year, track, sprinttype), year, sprinttype) for track in mif.loadschedule(year).OfficialEventName if mif.loadsession(year, track, sprinttype).session_info['Meeting']['OfficialName'] == track]))
+    """
+    schedule = mif.loadschedule(year)
+    for track in schedule.OfficialEventName:
+        session = mif.loadsession(year, track, sprinttype)
+        try:
+            if session.session_info['Meeting']['OfficialName'] == track:
+                lstcardata.append(maf.writeseasoncardata(track, session, year, sprinttype).drop_duplicates())
+                print('cardata retrieved')
+                lstlapdata.append(maf.writeseasonlapdata(track, session, year, sprinttype).drop_duplicates())
+                print('lapdata retrieved')
+                lstweatherdata.append(maf.writeseasonweatherdata(track, session, year, sprinttype).drop_duplicates())
+                print('weatherdata retrieved')
+        except AttributeError as ae:
+            print(f'\x1b[31m{ae}\x1b[0m')
+    _lstcardata = pd.concat(lstcardata)
+    _lstlapdata = pd.concat(lstlapdata)
+    _lstweatherdata = pd.concat(lstweatherdata)
+    print('\n\n\nData is being written, it will take a while...')
+    fw.writecsv(f'cardata_{year}', _lstcardata)
+    print('cardata written...')
+    fw.writecsv(f'lapdata_{year}', _lstlapdata)
+    print('lapdata written...')
+    fw.writecsv(f'weatherdata_{year}', _lstweatherdata)
+    print('weatherdata written...')
+    print("Season written")
 
 
 if __name__ == "__main__":
@@ -113,13 +138,7 @@ if __name__ == "__main__":
     print(f"Tijd: \x1b[31m{(perf_counter() - starttijd) * 1000:.0f}ms")
 
     # TODO: SESSION.POS_DATA
-
-    # WRITE ONE SESSION
-    year, location = 2018, 'monza'
-    print("\x1b[32m")
-    # session = mif.loadsession(year, location, sprinttype[4])  # Requests the session
-    print("\x1b[0m")
-    # writeallsingle(session, year)
+    pass
 
     # deleteall()
 
