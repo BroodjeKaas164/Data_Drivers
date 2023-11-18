@@ -31,12 +31,12 @@ def allcardata(track, year, session, combinedcardata=[], _cardata=None):
                     while x <= cardata.Brake.size:
                         lstdriver.append(driver)
                         lstyear.append(year)
-                        lsttrack.append(session.event.RoundNumber)
+                        lsttrack.append(track)
                         lstlap.append(lap)
                         x += 1
                     cardata["driverID"] = lstdriver
                     cardata['year'] = lstyear
-                    cardata['roundnumber'] = lsttrack
+                    cardata['gp'] = lsttrack
                     cardata['lap'] = lstlap
                     combinedcardata.append(cardata)
                     lap += 1
@@ -105,10 +105,10 @@ def alllapdata(name, year, session, lap=1, combinedlapdata=[], _lapdata=None):
                 lapinfo = mif.loadlap(session, lap)
                 while x <= lapinfo.DriverNumber.size:
                     lstyear.append(year)
-                    lstname.append(session.event.RoundNumber)
+                    lstname.append(name)
                     x += 1
                 lapinfo['year'] = lstyear
-                lapinfo['roundnumber'] = lstname
+                lapinfo['gp'] = lstname
             except KeyError as ke:
                 print(f"\x1b[31m{ke}\x1b[0m")
             except ValueError as ve:
@@ -185,11 +185,11 @@ def allweatherdata(name, year, session, combinedweatherdata=[], lap=1, _weatherd
             while x <= weerdata.AirTemp.size:
                 lstyear.append(year)
                 lstlap.append(lap)
-                lstname.append(session.event.RoundNumber)
+                lstname.append(name)
                 x += 1
             weerdata['year'] = lstyear
             weerdata['lap'] = lstlap
-            weerdata['roundnumber'] = lstname
+            weerdata['gp'] = lstname
             combinedweatherdata.append(weerdata)
         except KeyError as ke:
             print(f"\x1b[31m{ke}\x1b[0m")
