@@ -17,7 +17,7 @@ def writecsv(name, data):
     except FileNotFoundError as fnfe:
         data.to_csv(f"{name}.csv", index=False)
     except AttributeError as ae:
-        print(f'\x1b[31mAttributeError: {ae}\x1b[0m')
+        print(f'\x1b[31m{ae}\x1b[0m')
 
 
 def writejson(name, data):
@@ -37,4 +37,4 @@ def writejson(name, data):
         with open(f"{name}.json", "w") as json_file:
             json.dump(list(data), json_file, indent=4)
     except TypeError as te:
-        print(f'\x1b[31mTypeError: {te}\x1b[0m')
+        print(f'\x1b[31m{te}\x1b[0m')
