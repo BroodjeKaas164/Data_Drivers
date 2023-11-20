@@ -1,6 +1,5 @@
 pandas
 fastf1
 pandas
-seaborn
 time
 os
