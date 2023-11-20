@@ -1,5 +1,3 @@
-from time import perf_counter
-
 import pandas as pd
 
 import filewriters as fw
@@ -27,7 +25,6 @@ def allcardata(track, year, session, sessiontype, cardata=None):
     """
     try:
         combinedcardata = []
-        starttijdcar = perf_counter()
         print(f'\x1b[32mGetting Car Telemetry Data... {track}')
         for driver in session.drivers:
             lap = 1
@@ -57,7 +54,6 @@ def allcardata(track, year, session, sessiontype, cardata=None):
                 print('Data not loaded')
         try:
             _cardata = pd.concat(combinedcardata)
-            print(f"Tijd: \x1b[31m{(perf_counter() - starttijdcar) * 1000:.0f}ms")
             return _cardata
         except UnboundLocalError as ule:
             print(f"\x1b[31m{ule}\x1b[0m")
@@ -77,7 +73,6 @@ def alllapdata(name, year, session, sessiontype, lap=1, lapinfo=None):
     """
     try:
         combinedlapdata = []
-        starttijdlap = perf_counter()
         print(f'\x1b[32mGetting Lap Data... {name}')
         while lap <= session.total_laps:
             try:
@@ -99,7 +94,6 @@ def alllapdata(name, year, session, sessiontype, lap=1, lapinfo=None):
             # print(lapinfo)
             lap += 1
         _lapdata = pd.concat(combinedlapdata)
-        print(f"Tijd: \x1b[31m{(perf_counter() - starttijdlap) * 1000:.0f}ms")
         return _lapdata
     except AttributeError as ae:
         print(f"\x1b[31m{ae}\x1b[0m")
@@ -115,7 +109,6 @@ def allweatherdata(name, year, session, sessiontype, lap=1, weerdata=None):
     """
     try:
         combinedweatherdata = []
-        starttijdweather = perf_counter()
         print(f'\x1b[32mGetting Weather Data... {name}')
         try:
             lstyear, lstlap, lstname, lsttype, x = [], [], [], [], 1
@@ -140,7 +133,6 @@ def allweatherdata(name, year, session, sessiontype, lap=1, weerdata=None):
             print("Data Not Loaded")
         lap += 1
         _weatherdata = pd.concat(combinedweatherdata)
-        print(f"Tijd: \x1b[31m{(perf_counter() - starttijdweather) * 1000:.0f}ms")
         return _weatherdata
     except AttributeError as ae:
         print(f"\x1b[31m{ae}\x1b[0m")

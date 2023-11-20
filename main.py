@@ -1,7 +1,5 @@
 import os
 import threading
-from time import perf_counter
-
 import pandas as pd
 
 import filewriters as fw
@@ -232,7 +230,6 @@ if __name__ == "__main__":
         yearsession -= 1
 
     # Iterative reading per file and bulkwrite to one
-    starttijd = perf_counter()
     try:
         fw.writecsv('master_cardata', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(project_root_dir) if bestand.endswith('.csv') and bestand.startswith('macro_cardata')]).drop_duplicates())
         fw.writecsv('master_lapdata', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(project_root_dir) if bestand.endswith('.csv') and bestand.startswith('macro_lapdata')]).drop_duplicates())
@@ -240,7 +237,6 @@ if __name__ == "__main__":
         fw.writecsv('master_schedule', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(project_root_dir) if bestand.endswith('.csv') and bestand.startswith('schedule')]).drop_duplicates())
     except:
         pass
-    print(f"Tijd: \x1b[31m{(perf_counter() - starttijd) * 1000:.0f}ms")
 
     # TODO: SESSION.POS_DATA
     pass
