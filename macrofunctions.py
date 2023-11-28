@@ -1,6 +1,5 @@
 import pandas as pd
 
-import filewriters as fw
 import microfunctions as mif
 
 
@@ -19,7 +18,12 @@ def cacheall(year, sprinttype):
         print("\x1b[0m")
 
 
-def allcardata(track, year, session, sessiontype, cardata=None):
+def allposdata(track, year, session, sessiontype, posdata=None):
+    # TODO: position data
+    pass
+
+
+def allcardataold(track, year, session, sessiontype, cardata=None):
     """
     # TODO: BESCHRIJVING
     """
@@ -28,6 +32,7 @@ def allcardata(track, year, session, sessiontype, cardata=None):
         print(f'\x1b[32mGetting Car Telemetry Data... {track}')
         for driver in session.drivers:
             lap = 1
+            test = session.car_data[driver]
             try:
                 while lap <= session.total_laps:
                     lstdriver, lstyear, lsttrack, lstlap, lsttype, x = [], [], [], [], [], 1
@@ -50,8 +55,47 @@ def allcardata(track, year, session, sessiontype, cardata=None):
                 print(f"\x1b[31m{ke}\x1b[0m")
             except ValueError as ve:
                 print(f"\x1b[31m{ve}\x1b[0m")
-            except:
-                print('Data not loaded')
+        try:
+            _cardata = pd.concat(combinedcardata)
+            return _cardata
+        except UnboundLocalError as ule:
+            print(f"\x1b[31m{ule}\x1b[0m")
+        except AttributeError as ae:
+            print(f"\x1b[31m{ae}\x1b[0m")
+        except TypeError as te:
+            print(f"\x1b[31m{te}\x1b[0m")
+    except AttributeError as ae:
+        print(f"\x1b[31m{ae}\x1b[0m")
+    except ValueError as ve:
+        print(f"\x1b[31m{ve}\x1b[0m")
+
+
+def allcardata(track, year, session, sessiontype, cardata=None):
+    """
+    # TODO: BESCHRIJVING
+    """
+    try:
+        combinedcardata = []
+        print(f'\x1b[32mGetting Car Telemetry Data... {track}')
+        for driver in session.drivers:
+            try:
+                lstdriver, lstyear, lsttrack, lsttype, x = [], [], [], [], 1
+                cardata = session.car_data[driver]
+                while x <= cardata.Brake.size:
+                    lstdriver.append(driver)
+                    lstyear.append(year)
+                    lsttrack.append(track)
+                    lsttype.append(sessiontype)
+                    x += 1
+                cardata["driverID"] = lstdriver
+                cardata['year'] = lstyear
+                cardata['gp'] = lsttrack
+                cardata['sessiontype'] = lsttype
+                combinedcardata.append(cardata)
+            except KeyError as ke:
+                print(f"\x1b[31m{ke}\x1b[0m")
+            except ValueError as ve:
+                print(f"\x1b[31m{ve}\x1b[0m")
         try:
             _cardata = pd.concat(combinedcardata)
             return _cardata
@@ -74,7 +118,7 @@ def alllapdata(name, year, session, sessiontype, lap=1, lapinfo=None):
     try:
         combinedlapdata = []
         print(f'\x1b[32mGetting Lap Data... {name}')
-        while lap <= session.total_laps:
+        while lap <= session.weather_data.size:
             try:
                 lstyear, lstname, lsttype, x = [], [], [], 1
                 lapinfo = mif.loadlap(session, lap)
@@ -99,8 +143,6 @@ def alllapdata(name, year, session, sessiontype, lap=1, lapinfo=None):
         print(f"\x1b[31m{ae}\x1b[0m")
     except TypeError as te:
             print(f"\x1b[31m{te}\x1b[0m")
-    except:
-        print('\t\tData not loaded')
 
 
 def allweatherdata(name, year, session, sessiontype, lap=1, weerdata=None):
@@ -113,7 +155,7 @@ def allweatherdata(name, year, session, sessiontype, lap=1, weerdata=None):
         try:
             lstyear, lstlap, lstname, lsttype, x = [], [], [], [], 1
             weerdata = session.weather_data
-            # TODO: Krijg af en toe lege dataframes terug?
+            # TODO: Check if lap data matches with weather data
             while x <= weerdata.AirTemp.size:
                 lstyear.append(year)
                 lstlap.append(lap)
@@ -129,8 +171,6 @@ def allweatherdata(name, year, session, sessiontype, lap=1, weerdata=None):
             print(f"\x1b[31m{ke}\x1b[0m")
         except ValueError as ve:
             print(f"\x1b[31m{ve}\x1b[0m")
-        except:
-            print("Data Not Loaded")
         lap += 1
         _weatherdata = pd.concat(combinedweatherdata)
         return _weatherdata
