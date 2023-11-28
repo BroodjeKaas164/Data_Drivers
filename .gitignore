@@ -5,6 +5,9 @@
 /Data/
 /todos.txt
 /.ipynb_checkpoints
+/sql_database/
+/.venv
+sql_database.py
 /macro_cardata_2018.csv
 /macro_cardata_2019.csv
 /macro_cardata_2020.csv
@@ -23,10 +26,10 @@
 /macro_weatherdata_2021.csv
 /macro_weatherdata_2022.csv
 /macro_weatherdata_2023.csv
-/master_cardata.csv
-/master_lapdata.csv
+/master_cardata-R.csv
+/master_lapdata-R.csv
 /master_schedule.csv
-/master_weatherdata.csv
+/master_weather-R.csv
 /schedule_1950.csv
 /schedule_1951.csv
 /schedule_1952.csv
