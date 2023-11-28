@@ -241,9 +241,9 @@ if __name__ == "__main__":
         # Iterative filereading and bulkwrite to one
         try:
             print(f'\n\nData is being aggregated...')
-            fw.writecsv(f'master_cardata-{sessiontype}', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(projectroot()) if bestand.endswith('.csv') and bestand.startswith(f'macro_cardata')]).drop_duplicates())
-            fw.writecsv(f'master_lapdata-{sessiontype}', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(projectroot()) if bestand.endswith('.csv') and bestand.startswith(f'macro_lapdata')]).drop_duplicates())
-            fw.writecsv(f'master_weather-{sessiontype}', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(projectroot()) if bestand.endswith('.csv') and bestand.startswith(f'macro_weatherdata')]).drop_duplicates())
+            fw.writecsv(f'master_cardata-{sessiontype}', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(projectroot()) if bestand.endswith(f'{sessiontype}.csv') and bestand.startswith(f'macro_cardata')]).drop_duplicates())
+            fw.writecsv(f'master_lapdata-{sessiontype}', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(projectroot()) if bestand.endswith(f'{sessiontype}.csv') and bestand.startswith(f'macro_lapdata')]).drop_duplicates())
+            fw.writecsv(f'master_weather-{sessiontype}', pd.concat([pd.read_csv(bestand) for bestand in os.listdir(projectroot()) if bestand.endswith(f'{sessiontype}.csv') and bestand.startswith(f'macro_weatherdata')]).drop_duplicates())
             try:
                 if deletefiles == True:
                     bestanden = [bestand for bestand in os.listdir(projectroot()) if bestand.endswith('.csv') and bestand.startswith('macro_')]
