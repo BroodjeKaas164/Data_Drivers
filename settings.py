@@ -3,4 +3,4 @@ from dataclasses import dataclass
 
 @dataclass
 class Settings:
-    pass
+    clear_cache: bool = False
