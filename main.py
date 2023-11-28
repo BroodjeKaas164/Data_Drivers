@@ -52,9 +52,7 @@ def circuit_info(session):
 def writeallseason(year, sprinttype):
     """
     TODO: BESCHRIJVING
-    - Laps
-    - Cars
-    - Weather
+    - Position
     """
     fw.writecsv(f'schedule_{year}', mif.loadschedule(year))
     schedule = pd.read_csv(f'schedule_{year}.csv')
@@ -102,7 +100,6 @@ def writeallseason(year, sprinttype):
         return None
 
     for track in schedule.EventName:
-        # TODO: skip session load when file already exists
         low_car = low_lap = low_weather = False
 
         if os.path.exists(os.path.join(projectroot(), f'micro_cardata_{year}_{track}-{sprinttype}.csv')) == True:
@@ -122,7 +119,6 @@ def writeallseason(year, sprinttype):
             low_weather = False
 
         try:
-            # TODO: Check conditionals for file hierarchies
             if low_car == medium_car == False or low_lap == medium_car == False or low_weather == medium_car == False:
                 session = mif.loadsession(year, track, sprinttype)
                 if low_car == medium_car == False:
@@ -140,14 +136,12 @@ def writeallseason(year, sprinttype):
             print(f'\x1b[31m{ke}\x1b[0m')
 
     try:
-        # TODO: Check conditionals for file hierarchies
         if medium_car == False:
             print('\nData is being written, it will take a while...')
             bestanden = [bestand for bestand in os.listdir(projectroot()) if bestand.endswith('.csv') and bestand.startswith('micro_cardata')]
             fw.writecsv(f'macro_cardata_{year}-{sprinttype}', pd.concat([pd.read_csv(bestand) for bestand in bestanden]).drop_duplicates())
             print('cardata written...')
-            if deletefiles:
-                [os.remove(os.path.join(projectroot(), bestand)) for bestand in bestanden]
+            [os.remove(os.path.join(projectroot(), bestand)) for bestand in bestanden if deletefiles == True]
     except UnboundLocalError as ule:
         print(f'\x1b[31m{ule}\x1b[0m')
     except ValueError as ve:
@@ -158,8 +152,7 @@ def writeallseason(year, sprinttype):
             bestanden = [bestand for bestand in os.listdir(projectroot()) if bestand.endswith('.csv') and bestand.startswith('micro_lapdata')]
             fw.writecsv(f'macro_lapdata_{year}-{sprinttype}', pd.concat([pd.read_csv(bestand) for bestand in bestanden]).drop_duplicates())
             print('lapdata written...')
-            if deletefiles == True:
-                [os.remove(os.path.join(projectroot(), bestand)) for bestand in bestanden]
+            [os.remove(os.path.join(projectroot(), bestand)) for bestand in bestanden if deletefiles == True]
     except UnboundLocalError as ule:
         print(f'\x1b[31m{ule}\x1b[0m')
     except ValueError as ve:
@@ -170,8 +163,7 @@ def writeallseason(year, sprinttype):
             bestanden = [bestand for bestand in os.listdir(projectroot()) if bestand.endswith('.csv') and bestand.startswith('micro_weatherdata')]
             fw.writecsv(f'macro_weatherdata_{year}-{sprinttype}', pd.concat([pd.read_csv(bestand) for bestand in bestanden]).drop_duplicates())
             print('weatherdata written...')
-            if deletefiles == True:
-                [os.remove(os.path.join(projectroot(), bestand)) for bestand in bestanden]
+            [os.remove(os.path.join(projectroot(), bestand)) for bestand in bestanden if deletefiles == True]
     except UnboundLocalError as ule:
         print(f'\x1b[31m{ule}\x1b[0m')
     except ValueError as ve:
@@ -181,6 +173,7 @@ def writeallseason(year, sprinttype):
 
 
 def circuitdict():
+    # TODO: BESCHRIJVING
     thisdict = {
         'jack': 4098,
         'sape': 4139,
