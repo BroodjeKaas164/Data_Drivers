@@ -31,7 +31,10 @@ def loadlap(session, lap):
     Returns:
     - Lapinformation (DataFrame): 
     """
-    return session.laps.pick_lap(lap)
+    try:
+        return session.laps.pick_lap(lap)
+    except:
+        return None
 
 
 def loadremaining():
@@ -69,7 +72,10 @@ def loadsession(year, circuit, sessiontype):
     Returns:
     - session (DataFrame): which contains a variety of information regarding the requested session.
     """
-    session = fastf1.get_session(year, circuit, sessiontype)
+    try:
+        session = fastf1.get_session(year, circuit, sessiontype)
+    except ValueError:
+        return None
     try:
         session.load(laps=True, weather=True, telemetry=True, messages=True)
         return session

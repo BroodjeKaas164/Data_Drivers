@@ -8,9 +8,7 @@ def mean(lst, totaal=0):
     Returns:
         float: Het gemiddelde van de gegeven getallen.
     """
-    for getal in lst:
-        totaal += getal
-    return totaal / len(lst)
+    return sum(lst) / len(lst)
 
 
 def rnge(lst):
