@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import pandas as pd
@@ -6,6 +7,17 @@ import filewriters as fw
 import macrofunctions as maf
 import microfunctions as mif
 import sql_database as sd
+from settings import settings
+
+CLEAR_CACHE = settings.clear_cache
+CLEAR_DEEP = settings.clear_deep
+MACRO_MAP = settings.macro_data_dir
+MICRO_MAP = settings.micro_data_dir
+MASTER_MAP = settings.master_data_dir
+
+if CLEAR_CACHE:
+    mif.fastf1.Cache.clear_cache(deep=CLEAR_DEEP)
+
 
 mif.fastf1.plotting.setup_mpl()
 
@@ -13,10 +25,13 @@ mif.fastf1.plotting.setup_mpl()
 def deleteall():
     """
     Deletes all csv-files in the given directory
+
+    args: None
+    Returns: None
     """
     bestanden = os.listdir(projectroot())
-    csv_bestanden = [bestand for bestand in bestanden if bestand.endswith('.csv')]
-    for csv_bestand in csv_bestanden:
+    csvs = [bestand for bestand in bestanden if bestand.endswith('.csv')]
+    for csv_bestand in csvs:
         bestand_pad = os.path.join(projectroot(), csv_bestand)
         os.remove(bestand_pad)
         print(f'{csv_bestand} is verwijderd.')
@@ -52,7 +67,6 @@ def circuit_info(session):
 def writeallseason(year, sprinttype):
     """
     TODO: BESCHRIJVING
-    - Position
     """
     fw.writecsv(f'schedule_{year}', mif.loadschedule(year))
     schedule = pd.read_csv(f'schedule_{year}.csv')
@@ -101,7 +115,6 @@ def writeallseason(year, sprinttype):
 
     for track in schedule.EventName:
         low_car = low_lap = low_weather = False
-
         if os.path.exists(os.path.join(projectroot(), f'micro_cardata_{year}_{track}-{sprinttype}.csv')) == True:
             print(f'micro_cardata_{year}_{track}-{sprinttype}.csv exists')
             low_car = True
@@ -113,7 +126,7 @@ def writeallseason(year, sprinttype):
         else:
             low_lap = False
         if os.path.exists(os.path.join(projectroot(), f'micro_weatherdata_{year}_{track}-{sprinttype}.csv')) == True:
-            print(f'micro_weatherdata_{year}-{sprinttype}.csv exists')
+            print(f'micro_weatherdata_{year}_{track}-{sprinttype}.csv exists')
             low_weather = True
         else:
             low_weather = False
@@ -182,7 +195,11 @@ def circuitdict():
     return thisdict
 
 
-def projectroot():
+def projectroot(): # Via Path
+    return settings.root_dir
+
+
+def projectrootold(): # Via OS
     return os.path.dirname(os.path.abspath(__file__))
 
 
@@ -191,7 +208,7 @@ if __name__ == "__main__":
     _macrodatamap = os.path.join(projectroot(), 'Data/Macrodata/')
     _microdatamap = os.path.join(projectroot(), 'Data/Microdata/')
     
-    yearschedule = 2023
+    yearschedule = datetime.date.today().year
     sprinttype = ['FP1', 'FP2', 'FP3', 'Q', 'R']
     sprinttype.reverse()
 
@@ -200,10 +217,9 @@ if __name__ == "__main__":
     deletefiles = True # This deletes temporary csv-files that are used to aggregate to masterdatasets
 
     # SCHEDULES
-    try:
-        pd.read_csv(f'master_schedule.csv')
-        print(f'master_schedule.csv exists')
-    except FileNotFoundError as fnfe:
+    if os.path.exists(os.path.join(projectroot(), f'master_schedule.csv')) == True:
+        print(f"masterschedule.csv exists")
+    else:
         while yearschedule >= 1950:
             try:
                 pd.read_csv(f'schedule_{yearschedule}.csv')
@@ -225,7 +241,7 @@ if __name__ == "__main__":
 
     # WARNING: Hard limit for data is 2018
     for sessiontype in sprinttype:
-        yearsession = 2023
+        yearsession = datetime.date.today().year
         while yearsession >= 2018:
             print(f'\nSeason {sessiontype} {yearsession}')
             writeallseason(yearsession, sessiontype)
@@ -248,10 +264,35 @@ if __name__ == "__main__":
         except:
             pass
 
+    try:
+        # Aggregates all sessiontypes to one file
+        if os.path.exists(os.path.join(projectroot(), f'aggregated_master_cardata.csv')) == True:
+            print(f"aggregated_master_cardata.csv exists")
+        else:
+            print('\n\n\ncar_data...')
+            bestanden = [bestand for bestand in os.listdir(projectroot()) if bestand.endswith('.csv') and bestand.startswith('master_cardata-')]
+            fw.writecsv(f'aggregated_master_cardata', pd.concat([pd.read_csv(csv) for csv in bestanden]))
+            print('Written!')
+        
+        if os.path.exists(os.path.join(projectroot(), f'aggregated_master_lapdata.csv')) == True:
+            print(f"aggregated_master_lapdata.csv exists")
+        else:
+            print('\n\n\nlap_data...')
+            bestanden = [bestand for bestand in os.listdir(projectroot()) if bestand.endswith('.csv') and bestand.startswith('master_lapdata-')]
+            fw.writecsv(f'aggregated_master_lapdata', pd.concat([pd.read_csv(csv) for csv in bestanden]))
+            print('Written!')
+        
+        if os.path.exists(os.path.join(projectroot(), f'aggregated_master_weather.csv')) == True:
+            print(f"aggregated_master_weather.csv exists")
+        else:
+            print('\n\n\nweather...')
+            bestanden = [bestand for bestand in os.listdir(projectroot()) if bestand.endswith('.csv') and bestand.startswith('master_weather-')]
+            fw.writecsv(f'aggregated_master_weather', pd.concat([pd.read_csv(csv) for csv in bestanden]))
+            print('Written!')
+    except FileNotFoundError:
+        print(FileNotFoundError)
 
     # TODO: SESSION.POS_DATA
     pass
 
     # deleteall()
-
-# l.fastf1.Cache.clear_cache()
