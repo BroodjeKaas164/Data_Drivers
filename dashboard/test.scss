@@ -1,6 +1,55 @@
-/*! Light Mode */ 
-$accent_color: #b50000;
-$background_color: #d1d1d1;
-$text_color: #060606;
+//== Gray Shades
+//## Different gray shades to be used for our variables and components
+$gray-darker: #0a1325;
+$gray-dark: #474e5c;
+$gray: #787d87;
+$gray-light: #a9acb3;
+$gray-primary: #e7e7e9;
+$gray-lighter: #f8f8f8;
 
-/*! Dark Mode */
+//== Step 1: Brand Colors
+$brand-default: $gray-primary;
+$brand-primary: #264ae5;
+$brand-success: #3cb33d;
+$brand-warning: #eca51c;
+$brand-danger: #e33f4e;
+
+$brand-logo: false;
+$brand-logo-height: 32px;
+$brand-logo-width: 32px; // Only used for CSS brand logo
+
+//== Step 2: UI Customization
+
+// Default Font Size & Color
+$font-size-default: 14px;
+$font-color-default: #0a1325;
+
+// Global Border Color
+$border-color-default: #ced0d3;
+$border-radius-default: 4px;
+
+// Topbar
+$topbar-bg: #020557;
+$topbar-minimalheight: 48px;
+$topbar-border-color: $border-color-default;
+
+// Sidebar
+$sidebar-bg: #24276c;
+
+// Topbar mobile
+$m-header-height: 45px;
+$m-header-bg: $topbar-bg;
+$m-header-color: #fff;
+$m-header-title-size: 16px;
+
+// Navbar Brand Name / For your company, product, or project name (used in layouts/base/)
+$navbar-brand-name: #fff;
+
+// Background Colors
+// Backgrounds
+$bg-color: #f8f8f8;
+$bg-color-secondary: #fff;
+
+// Default Link Color
+$link-color: $brand-primary;
+$link-hover-color: darken($link-color, 15%);
