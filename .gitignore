@@ -8,6 +8,7 @@
 sql_database.py
 Data/.DS_Store
 /**.csv
+/getdata_python/.ipynb_checkpoints
 .Rproj.user
 **.Rproj
 /getdata_python/**.csv
