@@ -195,7 +195,7 @@ def circuitdict():
     return thisdict
 
 
-def projectroot(): # Via Path
+def projectroot(): # Via settings - Path
     return settings.root_dir
 
 
@@ -204,10 +204,6 @@ def projectrootold(): # Via OS
 
 
 if __name__ == "__main__":
-    # TODO: Write files to dedicated maps
-    _macrodatamap = os.path.join(projectroot(), 'Data/Macrodata/')
-    _microdatamap = os.path.join(projectroot(), 'Data/Microdata/')
-    
     yearschedule = datetime.date.today().year
     sprinttype = ['FP1', 'FP2', 'FP3', 'Q', 'R']
     sprinttype.reverse()
