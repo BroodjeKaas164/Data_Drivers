@@ -22,6 +22,7 @@ def writecsv(name, data):
 
 def writejson(name, data):
     """
+    Source: ChatGPT
     Writes a DataFrame to a json-file with the given name
     - name (str): the name of the resulted file
     - data (DataFrame): the data which to be transformed into json-format
