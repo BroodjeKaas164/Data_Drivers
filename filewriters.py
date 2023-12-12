@@ -1,5 +1,12 @@
 import json
+import csv
 import pandas as pd
+
+
+def writecsvnew(parentdir, name, data):
+    # DOESN'T WORK YET
+    with open(f'{parentdir}/{name}.csv', 'wt', encoding='utf8', newline='') as file:
+        csv.writer(file).writerows(data)
 
 
 def writecsv(name, data):
@@ -15,6 +22,7 @@ def writecsv(name, data):
         pd.read_csv(f'{name}.csv')
         print('File already exists')
     except FileNotFoundError as fnfe:
+        # TODO: add datapath
         data.to_csv(f"{name}.csv", index=False)
     except AttributeError as ae:
         print(f'\x1b[31m{ae}\x1b[0m')
