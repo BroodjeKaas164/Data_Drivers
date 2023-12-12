@@ -2,6 +2,8 @@
 # waarin position wordt voorspeld op basis van points, raceId, driverId uit de dataset clean_driver_standings
 summary(model_driver <- lm(position ~ points + raceId + driverId, data=clean_driver_standings))
 summary(model_constructors <- lm(position ~ wins + raceId + constructorId + points, data=clean_constructor_standings))
+
+# Formule om te gebruiken voor documentatie
 # y = (xi*[wins])+(xi*[raceId])+...+{(intercept)}
 
 # maakt een nieuw tabel  

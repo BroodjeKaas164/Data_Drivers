@@ -4,13 +4,10 @@
 /.idea
 /.vscode
 /.ipynb_checkpoints
-/sql_database/
+/.sql_image
 sql_database.py
 Data/.DS_Store
-Data/Macrodata/**
-Data/Microdata/**
-Data/Masterdata/**
-Data/verkregen
 /**.csv
 .Rproj.user
 **.Rproj
+/getdata_python/**.csv
