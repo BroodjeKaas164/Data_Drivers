@@ -111,17 +111,18 @@ def allcardata(track, year, session, sessiontype, cardata=None):
         print(f"\x1b[31m{ve}\x1b[0m")
 
 
-def alllapdata(name, year, session, sessiontype, lap=1, lapinfo=None):
+def alllapdata(name, year, session, sessiontype, _=1, lapinfo=None):
     """
     # TODO: BESCHRIJVING
     """
     try:
         combinedlapdata = []
         print(f'\x1b[32mGetting Lap Data... {name}')
-        while lap <= session.weather_data.size:
+        while _ <= session.weather_data.size:
             try:
+                # TODO: Lap goes into 500-1500 because of weather_data size, is this justified?
                 lstyear, lstname, lsttype, x = [], [], [], 1
-                lapinfo = mif.loadlap(session, lap)
+                lapinfo = mif.loadlap(session, _)
                 while x <= lapinfo.DriverNumber.size:
                     lstyear.append(year)
                     lstname.append(name)
@@ -135,8 +136,7 @@ def alllapdata(name, year, session, sessiontype, lap=1, lapinfo=None):
             except ValueError as ve:
                 print(f"\x1b[31m{ve}\x1b[0m")
             combinedlapdata.append(lapinfo)
-            # print(lapinfo)
-            lap += 1
+            _ += 1
         _lapdata = pd.concat(combinedlapdata)
         return _lapdata
     except AttributeError as ae:
@@ -152,6 +152,7 @@ def allweatherdata(name, year, session, sessiontype, lap=1, weerdata=None):
     try:
         combinedweatherdata = []
         print(f'\x1b[32mGetting Weather Data... {name}')
+        # TODO: Lap informatie klopt niet, fix dit
         try:
             lstyear, lstlap, lstname, lsttype, x = [], [], [], [], 1
             weerdata = session.weather_data
