@@ -6,7 +6,7 @@ summary(model_constructors <- lm(position ~ wins + raceId + constructorId + poin
 # Formule om te gebruiken voor documentatie
 # y = (xi*[wins])+(xi*[raceId])+...+{(intercept)}
 
-# maakt een nieuw tabel  
+# maakt een nieuw tabel
 df_driver <- data.frame(coef(model_driver))
 df_constructor <- data.frame(coef(model_constructors))
 
