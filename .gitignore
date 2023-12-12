@@ -12,3 +12,5 @@ Data/Microdata/**
 Data/Masterdata/**
 Data/verkregen
 /**.csv
+.Rproj.user
+**.Rproj
