@@ -11,3 +11,4 @@ Data/.DS_Store
 .Rproj.user
 **.Rproj
 /getdata_python/**.csv
+/getdata_python/__pycache__
