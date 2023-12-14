@@ -5,6 +5,7 @@
 /.vscode
 /.ipynb_checkpoints
 /.sql_image
+/predictions_r/.DS_Store
 sql_database.py
 Data/.DS_Store
 /**.csv
