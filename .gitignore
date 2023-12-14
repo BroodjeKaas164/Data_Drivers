@@ -8,8 +8,9 @@
 sql_database.py
 Data/.DS_Store
 /**.csv
-/getdata_python/.ipynb_checkpoints
-.Rproj.user
+/**.Rdata
 **.Rproj
+.Rproj.user
+/getdata_python/.ipynb_checkpoints
 /getdata_python/**.csv
 /getdata_python/__pycache__
