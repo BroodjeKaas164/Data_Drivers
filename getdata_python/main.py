@@ -209,6 +209,7 @@ if __name__ == "__main__":
     sprinttype.reverse()
 
     # deleteall() # Deletes all csv files, ONLY USE FOR DATA RENEWAL AS THIS RENEWAL PROCESS TAKES A CONIDERABLE AMOUNT OF TIME
+    
     global deletefiles
     deletefiles = True # This deletes temporary csv-files that are used to aggregate to masterdatasets
 
@@ -235,7 +236,7 @@ if __name__ == "__main__":
         except ValueError as ve:
             print(f'\x1b[31m{ve}\x1b[0m')
 
-    # WARNING: Hard limit for data is 2018
+    # DISCLAIMER: Hard limit for data is 2018
     for sessiontype in sprinttype:
         yearsession = datetime.date.today().year
         while yearsession >= 2018:
