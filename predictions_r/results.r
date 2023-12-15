@@ -18,11 +18,6 @@ if(!require('randomGLM')) {
   library('randomGLM')
 }
 
-if(!require('elasticnet')) {
-  install.packages('elasticnet')
-  library('elasticnet')
-}
-
 dataset <- try(data.frame(read.csv('/Users/delano/Documents/GitHub/Data_Drivers/clean_results.csv', 
                                    sep = ';')))
 driver_standings <- try(data.frame(read.csv('/Users/delano/Library/CloudStorage/OneDrive-StichtingHogeschoolUtrecht/Jaar 2/Semester 3/Speedway Dynamics/Speedway Dynamics - Datasemester/DATA/3_Cleaned/clean_driver_standings.csv', 
@@ -34,7 +29,7 @@ train_data <- dataset[train_index,]
 test_data <- dataset[-train_index,]
 
 data_af_na <- na.omit(dataset)
-model_results <- train(positionOrder ~ statusId + grid, data = data_af_na, method = 'glm')
+model_results <- train(positionOrder ~ statusId + points + grid, data = data_af_na, method = 'lm')
 summary(model_results)
 
 results <- data.frame(data_af_na$positionOrder)
@@ -43,4 +38,4 @@ results['pos_pred'] <- predict(model_results, newdata = data_af_na)
 
 plot(results)
 
-# confusionMatrix(predict(model_results, newdata = test_data), test_data$positionOrder)
+confusionMatrix(predict(model_results, newdata = test_data), test_data$positionOrder)
