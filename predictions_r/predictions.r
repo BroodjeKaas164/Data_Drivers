@@ -1,4 +1,8 @@
-library(caret)
+if(!require('caret')) {
+  install.packages('caret')
+  library('caret')
+}
+
 # Maakt een samenvatting van het model waarin {}
 # waarin position wordt voorspeld op basis van points, raceId, driverId uit de dataset clean_driver_standings
 summary(model_driver <- lm(position ~ ., data=data.frame(read.csv("/Users/delano/Documents/GitHub/Data_Drivers/clean_driver_standings.csv", sep = ";"))))

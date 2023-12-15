@@ -4,13 +4,13 @@ if(!require('caret')) {
 }
 
 data(GermanCredit)
-        
+
 set.seed(200)
 trainIndex <- createDataPartition(GermanCredit$Amount, p = 0.85, list=FALSE)
 train_data <- GermanCredit[trainIndex,]
 test_data <- GermanCredit[-trainIndex,]
 
-summary(model <- train(Amount ~ ., data=train_data, method="glm"))
+summary(model <- train(Amount ~ ., data=train_data, method="lm"))
 
 
 predicted_creditscore <- data.frame(GermanCredit$Amount)
