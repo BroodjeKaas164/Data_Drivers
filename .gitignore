@@ -10,6 +10,7 @@ sql_database.py
 Data/.DS_Store
 /**.csv
 /**.Rdata
+.Rhistory
 **.Rproj
 .Rproj.user
 /getdata_python/.ipynb_checkpoints
