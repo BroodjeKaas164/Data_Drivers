@@ -2,14 +2,18 @@ if(!require('caret')) {
   install.packages('caret')
   library('caret')
 }
+
 if(!require('nnet')) {
   install.packages('nnet')
   library('nnet')
 }
+
 if(!require('tidyverse')) {
   install.packages('tidyverse')
   library('tidyverse')
 }
+
+installed.packages()
 
 dataset <- try(data.frame(read.csv('/Users/delano/Documents/GitHub/Data_Drivers/data/clean_results.csv', 
                                    sep = ';')))
@@ -60,5 +64,3 @@ prediction_results['pos_pred_parRF'] <- predict(model_parRF, newdata = test_data
 prediction_results['pos_pred_qrf'] <- predict(model_qrf, newdata = test_data_af_na)
 
 plot(prediction_results)
-
-# confusionMatrix(predict(model_results, newdata = test_data), test_data$positionOrder)
