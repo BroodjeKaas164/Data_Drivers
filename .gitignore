@@ -10,6 +10,7 @@ sql_database.py
 Data/.DS_Store
 /**.csv
 /**.Rdata
+/predictions_r/**.rda
 .Rhistory
 **.Rproj
 .Rproj.user
