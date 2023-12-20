@@ -9,7 +9,7 @@ library(tibble)
 dataset <- try(data.frame(read.csv('/Users/delano/Documents/GitHub/Data_Drivers/data/clean_results.csv', 
                                    sep = ';')))
 set <- na.omit(dataset)
-trainIndex <- createDataPartition(set$resultsId, p=0.7, list=FALSE)
+trainIndex <- createDataPartition(set$resultId, p=0.7, list=FALSE)
 trainData <- set[trainIndex,]
 testData <- set[-trainIndex,]
 
@@ -28,12 +28,13 @@ prediction_results['pos_rf'] <- data.frame(abs(round(predict(model_rf, newdata=s
 
 ################### "Gecombineerd Gemiddelde" ###################
 mean_results <- data.frame(set$positionOrder)
-mean_results['pos_predicted'] <- abs(round(rowMeans(prediction_results, na.rm=TRUE), digits=0))
-names(mean_results)[names(mean_results)=='set.positionOrder'] <- 'pos_real'
-# plot(mean_results)
+mean_results['mean_predicted'] <- abs(round(rowMeans(prediction_results, na.rm=TRUE), digits=0))
+mean_results$median_predicted = round(apply(prediction_results, 1, median, na.rm=TRUE), digits=0)
+names(mean_results)[names(mean_results)=='set.positionOrder'] <- 'real'
+plot(mean_results)
 
 ################### Confusion Matrix ###################
-predictions <- tibble('target' = set$positionOrder, 'prediction' = mean_results$pos_predicted)
+predictions <- tibble('target' = set$positionOrder, 'prediction' = mean_results$mean_predicted)
 cf <- as_tibble(table(predictions))
 plot_confusion_matrix(cf, 
                       target_col = 'target', 
