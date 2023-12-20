@@ -20,7 +20,7 @@ dataset <- try(data.frame(read.csv('/Users/delano/Documents/GitHub/Data_Drivers/
 driver_standings <- try(data.frame(read.csv('/Users/delano/Documents/GitHub/Data_Drivers/data/clean_driver_standings.csv', 
                                             sep = ';')))
 
-set.seed(40)
+set.seed(20)
 train_index <-  createDataPartition(dataset$resultId, p = 0.7, list = FALSE)
 train_data <- dataset[train_index,]
 test_data <- dataset[-train_index,]
