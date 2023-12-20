@@ -1,7 +1,4 @@
-if(!require('caret')) {
-  install.packages('caret')
-  library('caret')
-}
+library('caret')
 
 # Maakt een samenvatting van het model waarin {}
 # waarin position wordt voorspeld op basis van points, raceId, driverId uit de dataset clean_driver_standings
