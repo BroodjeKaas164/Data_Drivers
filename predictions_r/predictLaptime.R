@@ -4,28 +4,31 @@ library(caret)
 library(cvms)
 library(tibble)
 library(frbs)
+library(mgcv)
 
 ################### DEFINE DATASETS ###################
 dataset <- try(data.frame(read.csv('/Users/delano/Documents/GitHub/Data_Drivers/data/clean_lap_times.csv', 
                                    sep = ';')))
 set <- na.omit(dataset)
+set.seed(69)
 trainIndex <- createDataPartition(set$raceId, p=0.69, list=FALSE)
 trainData <- set[trainIndex,]
 testData <- set[-trainIndex,]
 
-################### Train Models ###################
+################### TRAIN MODELS ###################
 summary(model_glm <- try(train(milliseconds ~ driverId + raceId + position, data=trainData, method='glm')))
-summary(model_DENFIS <- try(train(milliseconds ~ driverId + raceId + position, data=trainData, method='DENFIS')))
+summary(model_bam <- try(train(milliseconds ~ driverId + raceId + position, data=trainData, method='bam')))
 
-################### Make Predictions ###################
-prediction_results <- data.frame(testData$milliseconds)
-names(prediction_results)[names(prediction_results)=='testData.milliseconds'] <- 'mil_real'
-prediction_results['mil_glm'] <- data.frame(abs(round(predict(model_glm, newdata=testData), digits=0)))
-prediction_results['mil_DENFIS'] <- data.frame(abs(round(predict(model_DENFIS, newdata=testData), digits=0)))
-plot(prediction_results)
+################### PREDICTION RESULTS ###################
+results_predicted <- data.frame(testData$milliseconds)
+names(results_predicted)[names(results_predicted)=='testData.milliseconds'] <- 'real'
+results_predicted['glm'] <- data.frame(abs(round(predict(model_glm, newdata=testData), digits=0)))
+results_predicted['bam'] <- data.frame(abs(round(predict(model_bam, newdata=testData), digits=0)))
+plot(results_predicted)
 
-################### "Gecombineerd Gemiddelde" ###################
-mean_results <- data.frame(testData$milliseconds)
-mean_results['mil_predicted'] <- abs(round(rowMeans(prediction_results, na.rm=TRUE), digits=0))
-names(mean_results)[names(mean_results)=='testData.milliseconds'] <- 'mil_real'
-plot(mean_results)
+################### COMBINED MEANDIAN ###################
+results_mean <- data.frame(testData$milliseconds)
+names(results_mean)[names(results_mean)=='testData.milliseconds'] <- 'real'
+results_mean['mean_predicted'] <- abs(round(rowMeans(results_predicted, na.rm=TRUE), digits=0))
+results_mean['median_predicted'] = round(apply(results_predicted, 1, median, na.rm=TRUE), digits=0)
+plot(results_mean)
