@@ -6,7 +6,6 @@ import pandas as pd
 import filewriters as fw
 import macrofunctions as maf
 import microfunctions as mif
-import sql_database as sd
 from settings import settings
 
 CLEAR_CACHE = settings.clear_cache
