@@ -10,12 +10,13 @@ dataset <- try(data.frame(read.csv('data/clean_employee_sample_data.csv',
                                    sep=';')))
 set <- na.omit(dataset)
 set.seed(69)
-trainIndex <- createDataPartition(set$Gender, p=0.69, list=FALSE)
+trainIndex <- createDataPartition(set$Gender, p=0.8, list=FALSE)
+trainIndex2 <- createDataPartition(set$Gender, p=0.05, list=FALSE)
 trainData <- set[trainIndex,]
 testData <- set[-trainIndex,]
 
 ################### TRAIN MODELS ###################
-models <- c('glm', 'glm.nb', 'parRF', 'rf', 'qrf')
+models <- c('glm', 'glm.nb', 'BstLm', 'parRF', 'rf', 'qrf', 'bridge')
 model_dict <- list()
 
 # TODO: Make train parameters dynamic
@@ -23,28 +24,30 @@ for (model in models) {
   model_name <- paste0('model_', model)
   model <- try(train(Annual.Salary ~ Gender + Age + Department, data=trainData, method=model))
   try(model_dict[[model_name]] <- model)
-} 
+}
 
 ################### PREDICTION RESULTS ###################
 # TODO?: remove real values from set?
-results_predicted <- data.frame(testData$Annual.Salary)
-names(results_predicted)[names(results_predicted)=='testData.Annual.Salary'] <- 'real'
+results_predicted <- data.frame(set$Annual.Salary)
+names(results_predicted)[names(results_predicted)=='set.Annual.Salary'] <- 'real'
 
 for (model in models) {
   model_name <- paste0('model_', model)
-  try(results_predicted[model] <- data.frame(abs(round(predict(model_dict[[model_name]], newdata=testData), digits=0))))
+  try(results_predicted[model] <- data.frame(abs(round(predict(model_dict[[model_name]], newdata=set), digits=0))))
 }
 plot(results_predicted)
 
 ################### COMBINED MEANDIAN ###################
-# TODO?: (van gemiddelde van alles) naar (gemiddelde van alles binnen 2*standaarddeviatie)???
-results_mean <- data.frame(testData$Annual.Salary)
-names(results_mean)[names(results_mean)=='testData.Annual.Salary'] <- 'real'
+results_mean <- data.frame(set$Annual.Salary)
+names(results_mean)[names(results_mean)=='set.Annual.Salary'] <- 'real'
 results_mean['mean_predicted'] <- abs(round(rowMeans(results_predicted, na.rm=TRUE), digits=0))
 results_mean['median_predicted'] <-  round(apply(results_predicted, 1, median, na.rm=TRUE), digits=0)
+results_mean['sd_predicted'] <-  apply(results_predicted, 1, sd, na.rm=TRUE)
+results_mean['var_predicted'] <- apply(results_predicted, 1, var, na.rm=TRUE)
 
-################### MODEL REWORK ###################
-testmodel <- try(train(real ~ mean_predicted + median_predicted, data=results_mean, method = 'parRF'))
+# MODEL REWORK
+testmodel <- try(train(real ~ mean_predicted + median_predicted + sd_predicted + var_predicted, data=results_mean, method = 'parRF'))
 testresults <- try(data.frame(predict(testmodel, data=results_mean)))
-results_mean['modelrework'] <- testresults
+results_mean['optimised'] <- testresults
 plot(results_mean)
+# plot(results_mean$real, results_mean$modelrework)

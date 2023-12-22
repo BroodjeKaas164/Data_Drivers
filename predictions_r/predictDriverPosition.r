@@ -9,7 +9,8 @@ library(tibble)
 dataset <- try(data.frame(read.csv('data/clean_results.csv', 
                                    sep=';')))
 set <- na.omit(dataset)
-trainIndex <- createDataPartition(set$resultId, p=0.7, list=FALSE)
+set.seed(69)
+trainIndex <- createDataPartition(set$resultId, p=0.85, list=FALSE)
 trainData <- set[trainIndex,]
 testData <- set[-trainIndex,]
 
@@ -36,7 +37,9 @@ results_mean <- data.frame(set$positionOrder)
 # results_mean <- data.frame(abs(round(rowMeans(results_predicted, na.rm=TRUE), digits=0)))
 names(results_mean)[names(results_mean)=='set.positionOrder'] <- 'real'
 results_mean['mean_predicted'] <- abs(round(rowMeans(results_predicted, na.rm=TRUE), digits=0))
-results_mean['median_predicted'] <- round(apply(results_predicted, 1, median, na.rm=TRUE), digits=0)
+results_mean['median_predicted'] <- apply(results_predicted, 1, median, na.rm=TRUE)
+results_mean['sd_predicted'] <-  apply(results_predicted, 1, sd, na.rm=TRUE)
+results_mean['var_predicted'] <- apply(results_predicted, 1, var, na.rm=TRUE)
 plot(results_mean)
 
 ################### CONFUSION MATRIX ###################

@@ -11,12 +11,14 @@ dataset <- try(data.frame(read.csv('data/clean_lap_times.csv',
                                    sep = ';')))
 set <- na.omit(dataset)
 set.seed(69)
-trainIndex <- createDataPartition(set$raceId, p=0.69, list=FALSE)
+# SPEEDY BOIS
+trainIndex <- createDataPartition(set$raceId, p=0.003, list=FALSE)
+trainIndex2 <- createDataPartition(set$raceId, p=0.85, list=FALSE)
 trainData <- set[trainIndex,]
-testData <- set[-trainIndex,]
+testData <- set[-trainIndex2,]
 
 ################### TRAIN MODELS ###################
-models <- c('glm', 'BstLm')
+models <- c('rf')
 model_dict <- list()
 
 for (model in models) {
@@ -40,4 +42,6 @@ results_mean <- data.frame(testData$milliseconds)
 names(results_mean)[names(results_mean)=='testData.milliseconds'] <- 'real'
 results_mean['mean_predicted'] <- abs(round(rowMeans(results_predicted, na.rm=TRUE), digits=0))
 results_mean['median_predicted'] = round(apply(results_predicted, 1, median, na.rm=TRUE), digits=0)
+results_mean['sd_predicted'] <-  apply(results_predicted, 1, sd, na.rm=TRUE)
+results_mean['var_predicted'] <- apply(results_predicted, 1, var, na.rm=TRUE)
 plot(results_mean)
