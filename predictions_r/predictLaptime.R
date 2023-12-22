@@ -7,7 +7,7 @@ library(frbs)
 library(mgcv)
 
 ################### DEFINE DATASETS ###################
-dataset <- try(data.frame(read.csv('/Users/delano/Documents/GitHub/Data_Drivers/data/clean_lap_times.csv', 
+dataset <- try(data.frame(read.csv('data/clean_lap_times.csv', 
                                    sep = ';')))
 set <- na.omit(dataset)
 set.seed(69)

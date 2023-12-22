@@ -6,7 +6,7 @@ library(tidyverse)
 library(frbs)
 
 ################### DEFINE DATASETS ###################
-dataset <- try(data.frame(read.csv('/Users/delano/Library/CloudStorage/OneDrive-StichtingHogeschoolUtrecht/Jaar 2/Semester 3/Speedway Dynamics/Practice/clean_employee_sample_data.csv', 
+dataset <- try(data.frame(read.csv('data/clean_employee_sample_data.csv', 
                                    sep=';')))
 set <- na.omit(dataset)
 set.seed(69)
