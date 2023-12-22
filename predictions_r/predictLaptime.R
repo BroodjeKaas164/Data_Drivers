@@ -11,7 +11,7 @@ dataset <- try(data.frame(read.csv('data/clean_lap_times.csv',
                                    sep = ';')))
 set <- na.omit(dataset)
 set.seed(69)
-trainIndex <- createDataPartition(set$raceId, p=0.1, list=FALSE)
+trainIndex <- createDataPartition(set$raceId, p=0.69, list=FALSE)
 trainData <- set[trainIndex,]
 testData <- set[-trainIndex,]
 
