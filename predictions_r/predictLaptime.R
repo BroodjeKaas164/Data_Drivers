@@ -11,23 +11,27 @@ dataset <- try(data.frame(read.csv('data/clean_lap_times.csv',
                                    sep = ';')))
 set <- na.omit(dataset)
 set.seed(69)
-trainIndex <- createDataPartition(set$raceId, p=0.69, list=FALSE)
+trainIndex <- createDataPartition(set$raceId, p=0.1, list=FALSE)
 trainData <- set[trainIndex,]
 testData <- set[-trainIndex,]
 
 ################### TRAIN MODELS ###################
-models <- c('glm', 'bam')
+models <- c('glm', 'BstLm')
 model_dict <- list()
 
-summary(model_dict[[paste0('model_', models[1])]] <- try(train(milliseconds ~ driverId + raceId + position, data=trainData, method=models[1])))
-summary(model_dict[[paste0('model_', models[2])]] <- try(train(milliseconds ~ driverId + raceId + position, data=trainData, method=models[2])))
+for (model in models) {
+  model_name <- paste0('model_', model)
+  model <- try(train(milliseconds ~ driverId + raceId + position, data=trainData, method=model))
+  try(model_dict[[model_name]] <- model)
+}
 
 ################### PREDICTION RESULTS ###################
 results_predicted <- data.frame(testData$milliseconds)
 names(results_predicted)[names(results_predicted)=='testData.milliseconds'] <- 'real'
 
 for (model in models) {
-    try(results_predicted[model] <- data.frame(abs(round(predict(model_dict[[model_name]], newdata=testData), digits=0))))
+  model_name <- paste0('model_', model)
+  try(results_predicted[model] <- data.frame(abs(round(predict(model_dict[[model_name]], newdata=testData), digits=0))))
 }
 plot(results_predicted)
 
