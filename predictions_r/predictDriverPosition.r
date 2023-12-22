@@ -14,16 +14,21 @@ trainData <- set[trainIndex,]
 testData <- set[-trainIndex,]
 
 ################### TRAIN MODELS ###################
-summary(model_qrf <- quantregForest(x=set, y=set$positionOrder, nthreads=4))
-summary(model_lm <- lm(positionOrder ~ points + grid, data=set))
-summary(model_rf <- randomForest(positionOrder ~ points + grid, data=set, proximity=TRUE))
+models <- c('qrf', 'lm', 'rf')
+model_dict <- list()
+
+summary(model_dict[[paste0('model_', models[1])]] <- quantregForest(x=set, y=set$positionOrder, nthreads=4))
+summary(model_dict[[paste0('model_', models[2])]] <- lm(positionOrder ~ points + grid, data=set))
+summary(model_dict[[paste0('model_', models[3])]] <- randomForest(positionOrder ~ points + grid, data=set, proximity=TRUE))
 
 ################### PREDICTION RESULTS ###################
 results_predicted <- data.frame(set$positionOrder)
 names(results_predicted)[names(results_predicted)=='set.positionOrder'] <- 'pos_real'
-results_predicted['pos_qrf'] <- data.frame(abs(round(predict(model_qrf, newdata=set), digits=0)))
-results_predicted['pos_lm'] <- data.frame(abs(round(predict(model_lm, newdata=set), digits=0)))
-results_predicted['pos_rf'] <- data.frame(abs(round(predict(model_rf, newdata=set), digits=0)))
+
+for (model in models) {
+    model_name <- paste0('model_', model)
+    try(results_predicted[model] <- data.frame(abs(round(predict(model_dict[[model_name]], newdata=set), digits=0))))
+}
 plot(results_predicted)
 
 ################### COMBINED MEANDIAN ###################

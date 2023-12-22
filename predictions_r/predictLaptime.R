@@ -16,14 +16,19 @@ trainData <- set[trainIndex,]
 testData <- set[-trainIndex,]
 
 ################### TRAIN MODELS ###################
-summary(model_glm <- try(train(milliseconds ~ driverId + raceId + position, data=trainData, method='glm')))
-summary(model_bam <- try(train(milliseconds ~ driverId + raceId + position, data=trainData, method='bam')))
+models <- c('glm', 'bam')
+model_dict <- list()
+
+summary(model_dict[[paste0('model_', models[1])]] <- try(train(milliseconds ~ driverId + raceId + position, data=trainData, method=models[1])))
+summary(model_dict[[paste0('model_', models[2])]] <- try(train(milliseconds ~ driverId + raceId + position, data=trainData, method=models[2])))
 
 ################### PREDICTION RESULTS ###################
 results_predicted <- data.frame(testData$milliseconds)
 names(results_predicted)[names(results_predicted)=='testData.milliseconds'] <- 'real'
-results_predicted['glm'] <- data.frame(abs(round(predict(model_glm, newdata=testData), digits=0)))
-results_predicted['bam'] <- data.frame(abs(round(predict(model_bam, newdata=testData), digits=0)))
+
+for (model in models) {
+    try(results_predicted[model] <- data.frame(abs(round(predict(model_dict[[model_name]], newdata=testData), digits=0))))
+}
 plot(results_predicted)
 
 ################### COMBINED MEANDIAN ###################
