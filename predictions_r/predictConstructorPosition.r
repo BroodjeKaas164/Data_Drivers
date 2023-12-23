@@ -1,15 +1,24 @@
 ################### IMPORT LIBRARIES ###################
 options(repos=c(CRAN="https://cloud.r-project.org"))
+library(caret)
 
 ################### DEFINE DATASETS ###################
-dataset <- try(data.frame(read.csv('data/clean_employee_sample_data.csv', 
+dataset <- try(data.frame(read.csv('data/clean_constructor_standings.csv', 
                                    sep=';')))
 set <- na.omit(dataset)
-trainIndex <- createDataPartition(set$resultId, p=0.7, list=FALSE)
+trainIndex <- createDataPartition(set$constructorStandingsId, p=0.7, list=FALSE)
 trainData <- set[trainIndex,]
 testData <- set[-trainIndex,]
 
 ################### TRAIN MODELS ###################
+models <- c('glm', 'lm')
+model_dict <- list()
+
+for (model in models) {
+  model_name <- paste0('model_', model)
+  model <- try(train(points ~ raceId + constructorId + position + wins, data=trainData, method=model))
+  try(model_dict[[model_name]] <- model)
+}
 
 ############## PREDICTION RESULTS ###################
 results_predicted <- data.frame(set$points)
@@ -28,9 +37,9 @@ results_mean['mean_predicted'] <- abs(round(rowMeans(results_predicted, na.rm=TR
 results_mean['median_predicted'] <-  round(apply(results_predicted, 1, median, na.rm=TRUE), digits=0)
 results_mean['sd_predicted'] <-  apply(results_predicted, 1, sd, na.rm=TRUE)
 results_mean['var_predicted'] <- apply(results_predicted, 1, var, na.rm=TRUE)
-plot(results_mean)
 
-################### CONFUSION MATRIX ###################
-predictions <- tibble('target'=set$positionOrder, 'prediction'=results_mean$mean_predicted)
-cf <- as_tibble(table(predictions))
-plot_confusion_matrix(cf, target_col='target', prediction_col='prediction', counts_col='n', add_col_percentages=FALSE,add_normalized=FALSE,add_row_percentages=FALSE,palette='Reds')
+# MODEL REWORK
+testmodel <- try(train(real ~ mean_predicted + median_predicted + sd_predicted + var_predicted, data=results_mean, method = 'glm'))
+testresults <- try(data.frame(predict(testmodel, data=results_mean)))
+results_mean['optimised'] <- testresults
+plot(results_mean)

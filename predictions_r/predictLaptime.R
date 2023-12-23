@@ -18,7 +18,7 @@ trainData <- set[trainIndex,]
 testData <- set[-trainIndex2,]
 
 ################### TRAIN MODELS ###################
-models <- c('rf')
+models <- c('glm', 'rf')
 model_dict <- list()
 
 for (model in models) {
@@ -44,4 +44,9 @@ results_mean['mean_predicted'] <- abs(round(rowMeans(results_predicted, na.rm=TR
 results_mean['median_predicted'] = round(apply(results_predicted, 1, median, na.rm=TRUE), digits=0)
 results_mean['sd_predicted'] <-  apply(results_predicted, 1, sd, na.rm=TRUE)
 results_mean['var_predicted'] <- apply(results_predicted, 1, var, na.rm=TRUE)
+
+# MODEL REWORK
+testmodel <- try(train(real ~ mean_predicted + median_predicted + sd_predicted + var_predicted, data=results_mean, method = 'glm'))
+testresults <- try(data.frame(predict(testmodel, data=results_mean)))
+results_mean['optimised'] <- testresults
 plot(results_mean)

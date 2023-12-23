@@ -9,9 +9,8 @@ library(frbs)
 dataset <- try(data.frame(read.csv('data/clean_employee_sample_data.csv', 
                                    sep=';')))
 set <- na.omit(dataset)
-set.seed(69)
-trainIndex <- createDataPartition(set$Gender, p=0.8, list=FALSE)
-trainIndex2 <- createDataPartition(set$Gender, p=0.05, list=FALSE)
+set.seed(420)
+trainIndex <- createDataPartition(set$Gender, p=0.75, list=FALSE)
 trainData <- set[trainIndex,]
 testData <- set[-trainIndex,]
 
@@ -19,7 +18,9 @@ testData <- set[-trainIndex,]
 models <- c('glm', 'glm.nb', 'BstLm', 'parRF', 'rf', 'qrf', 'bridge')
 model_dict <- list()
 
-# TODO: Make train parameters dynamic
+# TODO: Make train parameters dynamic if possible
+p_factor <- 'Annual.Salary'
+
 for (model in models) {
   model_name <- paste0('model_', model)
   model <- try(train(Annual.Salary ~ Gender + Age + Department, data=trainData, method=model))
@@ -46,8 +47,15 @@ results_mean['sd_predicted'] <-  apply(results_predicted, 1, sd, na.rm=TRUE)
 results_mean['var_predicted'] <- apply(results_predicted, 1, var, na.rm=TRUE)
 
 # MODEL REWORK
-testmodel <- try(train(real ~ mean_predicted + median_predicted + sd_predicted + var_predicted, data=results_mean, method = 'parRF'))
-testresults <- try(data.frame(predict(testmodel, data=results_mean)))
+testmodel <- try(train(real ~ mean_predicted + median_predicted, data=results_mean, method = 'parRF'))
+testresults <- try(data.frame(round(predict(testmodel, data=results_mean), digits=0)))
 results_mean['optimised'] <- testresults
 plot(results_mean)
-# plot(results_mean$real, results_mean$modelrework)
+
+df_predicted <- data.frame(set$Annual.Salary)
+names(df_predicted)[names(df_predicted)=='set.Annual.Salary'] <- 'real'
+df_predicted['predicted'] <- testresults
+df_predicted['verschil'] <- round(apply(df_predicted, 1, sd, na.rm=TRUE), digits=0)
+plot(df_predicted)
+
+# TODO: How do I actually use the models?
