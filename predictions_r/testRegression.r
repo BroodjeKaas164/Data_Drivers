@@ -1,76 +1,62 @@
 ################### IMPORT LIBRARIES ###################
 options(repos = c(CRAN = "https://cloud.r-project.org"))
-library(caret)
-library(nnet)
-library(tidyverse)
-library(frbs)
+source('predictions_r/sourceUsedLibraries.r', chdir=TRUE)
+source('predictions_r/sourceModelFunctions.r', chdir=TRUE)
 
 ################### DEFINE DATASETS ###################
 # Import Datasets
 dataset <- try(data.frame(read.csv('data/clean_employee_sample_data.csv', 
                                    sep=';')))
 set <- na.omit(dataset)
-set.seed(420)
+set.seed(69)
 
 # Split datasets
-trainIndex <- createDataPartition(set$Gender, p=0.7, list=FALSE)
+trainIndex <- createDataPartition(set$Gender, p=0.75, list=FALSE)
 trainData <- set[trainIndex,]
 testData <- set[-trainIndex,]
 
 ################### DEFINE PARAMETERS ###################
 # SETTINGS
 # TODO: Make train parameters dynamic if possible
-# c('glm', 'glm.nb', 'BstLm', 'parRF', 'rf', 'qrf', 'bridge')
-models <- c('glm', 'glm.nb','parRF', 'qrf', 'bridge')
+models <- c('glm', 'glm.nb', 'lm', 'parRF', 'qrf', 'bridge', 'leapForward', 'leapBackward')
 optimiseModel <- 'glm.nb'
 p_factor <- 'Annual.Salary'
 
-# INITIALISERS
-model_dict <- list()
-real_values <- set[[as.character(p_factor)]]
-rename_real <- paste0('set.', as.character(p_factor))
-
 ################### TRAIN MODELS ###################
-# Gender + Age + Department
-for (model in models) {
-  model_name <- paste0('model_', model)
-  model <- try(train(Annual.Salary ~ Gender + Age + Department, data=trainData, method=model))
-  try(model_dict[[model_name]] <- model)
-  print(summary(model))
+train_models <- function(models, trainData, model_dict=list()) {
+  for (model in models) {
+    model_name <- paste0('model_', model)
+    print(model_name)
+    model <- try(train(Annual.Salary ~ Gender + Age + Department, data=trainData, method=model))
+    try(model_dict[[model_name]] <- model)
+    print(summary(model))
+  }
+  return(model_dict)
 }
 
 ################### PREDICTION RESULTS ###################
-# TODO?: remove real values from set?
-results_predicted <- data.frame(real_values)
-names(results_predicted)[names(results_predicted)=='real_values'] <- 'real'
-
-for (model in models) {
-  model_name <- paste0('model_', model)
-  try(results_predicted[model] <- data.frame(abs(round(predict(model_dict[[model_name]], newdata=set), digits=0))))
-  print(summary(results_predicted[model]))
-}
-print(summary(results_predicted))
-plot(results_predicted)
+plot(resultsPhase1 <- assign_results(models, set, train_models(models, set)))
 
 ################### COMBINED MEANDIAN ###################
-results_mean <- data.frame(real_values)
-names(results_mean)[names(results_mean)=='real_values'] <- 'real'
-results_mean['p_mean'] <- abs(round(rowMeans(results_predicted, na.rm=TRUE), digits=0))
-results_mean['p_median'] <-  round(apply(results_predicted, 1, median, na.rm=TRUE), digits=0)
-results_mean['p_sd'] <-  apply(results_predicted, 1, sd, na.rm=TRUE)
-results_mean['p_var'] <- apply(results_predicted, 1, var, na.rm=TRUE)
-plot(results_mean)
+plot(resultsMeandian <- combined_meandian(set, p_factor, resultsPhase1))
 
-# MODEL REWORK
-trainIndexOptimised <- createDataPartition(results_mean$real, p=0.6, list=FALSE)
-trainDataOptimised <- results_mean[trainIndexOptimised,]
+################### MODEL REWORK ###################
+trainIndexOptimised <- createDataPartition(resultsMeandian$real, p=0.5, list=FALSE)
+trainDataOptimised <- resultsMeandian[trainIndexOptimised,]
 
-model_optimised <- try(train(real ~ p_mean + p_median, data=trainDataOptimised, method=optimiseModel))
+model_optimised <- try(train(real ~ p_mean + p_median + p_sd + p_var, data=trainDataOptimised, method=optimiseModel))
 
-results_final <- data.frame(real_values)
-names(results_final)[names(results_final)=='real_values'] <- 'real'
-results_final['p_optimised'] <- try(data.frame(round(predict(model_optimised, newdata=results_mean), digits=0)))
-results_final['difference'] <- results_final$p_optimised - results_mean$real
-plot(results_final)
+reworked_results <- function(df_set, p_factor) {
+  results_final <- data.frame(df_set[[as.character(p_factor)]])
+  names(results_final)[names(results_final)=='df_set..as.character.p_factor...'] <- 'real'
+  results_final['p_optimised'] <- try(data.frame(round(predict(model_optimised, newdata=resultsMeandian), digits=0)))
+  results_final['difference'] <- results_final$p_optimised - resultsMeandian$real
+  print(summary(results_final))
+  return(results_final)
+}
+plot(final <- reworked_results(set, p_factor))
 
-# TODO: How do I actually use the models?
+################### SHOW RESULTS ###################
+predicted_difference <- data.frame(set$Annual.Salary)
+names(predicted_difference)[names(predicted_difference)=='set.Annual.Salary'] <- 'real'
+predicted_difference['predicted'] <- final$p_optimised
