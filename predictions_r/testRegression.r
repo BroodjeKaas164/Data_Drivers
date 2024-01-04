@@ -9,6 +9,7 @@ source('predictions_r/sourceModelFunctions.r', chdir=TRUE)
 set.seed(69)
 use_models <- c('glm', 'glm.nb', 'lm', 'parRF', 'qrf', 'bridge')
 optimise_model <- 'glm.nb'
+decimals <- -1
 p_factor <- 'Annual.Salary'
 
 # Import datasets
@@ -17,6 +18,9 @@ dataset <- try(data.frame(read.csv('data/clean_employee_sample_data.csv',
 alldata <- data_splitter(dataset, 0.8)
 trainers <- alldata[['trainers']]
 testers <- alldata[['testers']]
+
+################### EXPORT MODELFUNCTIONS HERE FOR EXTERNAL USE ###################
+# @here
 
 ################### TRAIN MODELS ###################
 train_models <- function(models, trainData, model_dict=list()) {

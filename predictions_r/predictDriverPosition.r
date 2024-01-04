@@ -7,7 +7,8 @@ source('predictions_r/sourceModelFunctions.r', chdir=TRUE)
 # SETTINGS
 set.seed(69)
 use_models <- c('qrf', 'lm', 'rf')
-optimise_model <- 'rf'
+optimise_model <- 'qrf'
+decimals <- 0 # -1 is unrounded
 p_factor <- 'positionOrder'
 
 # import datasets
@@ -40,6 +41,4 @@ plot(trainResultsMeandian <- combined_meandian(trainers, trainResultsAssigned))
 plot(final <- reworked_results(testers))
 
 ################### CONFUSION MATRIX ###################
-predictions <- tibble('target'=set$positionOrder, 'prediction'=final$p_optimised)
-cf <- as_tibble(table(predictions))
-plot_confusion_matrix(cf, target_col='target', prediction_col='prediction', counts_col='n', add_col_percentages=FALSE, add_normalized=FALSE, add_row_percentages=FALSE, palette='Reds')
+create_confusion_matrix(testers)

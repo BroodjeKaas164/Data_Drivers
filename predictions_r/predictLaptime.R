@@ -8,6 +8,7 @@ source('predictions_r/sourceModelFunctions.r', chdir=TRUE)
 set.seed(69)
 use_models <- c('glm', 'glm.nb')
 optimise_model <- 'glm'
+decimals <- 0
 p_factor <- 'milliseconds'
 
 # Import datasets

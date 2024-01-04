@@ -20,7 +20,11 @@ assign_results <- function(df_set, models, model_dict) {
   for (model in models) {
     model_name <- paste0('model_', model)
     print(model_name)
-    try(results_predicted[model] <- data.frame(abs(round(predict(model_dict[[model_name]], newdata=df_set), digits=0))))
+    if(decimals < 0) {
+      try(results_predicted[model] <- data.frame(abs(predict(model_dict[[model_name]], newdata=df_set))))
+    } else {
+      try(results_predicted[model] <- data.frame(abs(round(predict(model_dict[[model_name]], newdata=df_set), digits=decimals))))
+    }
   }
   
   # Show results
@@ -36,8 +40,8 @@ combined_meandian <- function(df_set, trained_results) {
   names(results_mean)[names(results_mean)=='df_set..p_factor..'] <- 'real'
 
   # Calculates the statistics per predicted row for all models
-  results_mean['p_mean'] <- abs(round(rowMeans(trained_results, na.rm=TRUE), digits=0))
-  results_mean['p_median'] <-  round(apply(trained_results, 1, median, na.rm=TRUE), digits=0)
+  results_mean['p_mean'] <- rowMeans(trained_results, na.rm=TRUE)
+  results_mean['p_median'] <-  apply(trained_results, 1, median, na.rm=TRUE)
   results_mean['p_sd'] <-  apply(trained_results, 1, sd, na.rm=TRUE)
   results_mean['p_var'] <- apply(trained_results, 1, var, na.rm=TRUE)
   
@@ -56,11 +60,22 @@ reworked_results <- function(df_set) {
   # Creating the table
   results_final <- data.frame(df_set[[p_factor]])
   names(results_final)[names(results_final)=='df_set..p_factor..'] <- 'real'
-  results_final['p_optimised'] <- try(data.frame(round(predict(model_optimised, newdata=temp_median), digits=0)))
+  if (decimals < 0) {
+    try(results_final['p_optimised'] <- data.frame(abs(predict(model_optimised, newdata=temp_median))))
+  } else {
+    try(results_final['p_optimised'] <- data.frame(abs(round(predict(model_optimised, newdata=temp_median), digits=decimals))))
+  }
   results_final['difference'] <- results_final$p_optimised - temp_median$real
   
   # Show results
   print('optimised results')
   print(summary(results_final))
   return(results_final)
+}
+
+################### CONFUSION MATRIX ###################
+create_confusion_matrix <- function(df_set) {
+  predictions <- tibble('target'=df_set$positionOrder, 'prediction'=reworked_results(df_set)$p_optimised)
+  cf <- as_tibble(table(predictions))
+  plot_confusion_matrix(cf, target_col='target', prediction_col='prediction', counts_col='n', add_col_percentages=FALSE, add_normalized=FALSE, add_row_percentages=FALSE, palette='Reds')
 }
