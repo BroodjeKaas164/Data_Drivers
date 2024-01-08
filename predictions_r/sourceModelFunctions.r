@@ -42,8 +42,8 @@ combined_meandian <- function(df_set, trained_results) {
   # Calculates the statistics per predicted row for all models
   results_mean['p_mean'] <- rowMeans(trained_results, na.rm=TRUE)
   results_mean['p_median'] <-  apply(trained_results, 1, median, na.rm=TRUE)
-  results_mean['p_sd'] <-  apply(trained_results, 1, sd, na.rm=TRUE)
   results_mean['p_var'] <- apply(trained_results, 1, var, na.rm=TRUE)
+  results_mean['p_sd'] <-  apply(trained_results, 1, sd, na.rm=TRUE)
   
   # Show results
   print('Mean results')
