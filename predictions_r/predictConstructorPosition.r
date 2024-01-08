@@ -37,4 +37,4 @@ trained_models <- train_models(use_models, trainers)
 # plot(trainResultsMeandian <- combined_meandian(trainers, trainResultsAssigned))
 
 ################### MODEL REWORK ###################
-plot(final <- reworked_results(testers))
+plot(final <- reworked_results(dataset))
