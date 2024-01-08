@@ -7,7 +7,7 @@ source('predictions_r/sourceModelFunctions.r', chdir=TRUE)
 # SETTINGS
 set.seed(69)
 use_models <- c('qrf', 'rf')
-optimise_model <- 'glm'
+optimise_model <- 'lm'
 decimals <- 0 # -1 is unrounded
 p_factor <- 'positionOrder'
 
@@ -25,7 +25,7 @@ train_models <- function(models, trainData, model_dict=list()) {
   for (model in models) {
     model_name <- paste0('model_', model)
     print(model_name)
-    model <- try(train(position ~ points + grid, data=trainData, method=model))
+    model <- try(train(positionOrder ~ points + grid, data=trainData, method=model))
     try(model_dict[[model_name]] <- model)
     print(summary(model))
   }
