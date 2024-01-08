@@ -7,15 +7,15 @@ source('predictions_r/sourceModelFunctions.r', chdir=TRUE)
 # SETTINGS
 # TODO: Make train parameters dynamic if possible
 set.seed(69)
-use_models <- c('glm', 'glm.nb', 'lm', 'parRF', 'qrf', 'bridge')
+use_models <- c('glm', 'glm.nb', 'lm')
 optimise_model <- 'glm.nb'
-decimals <- -1
+decimals <- 2
 p_factor <- 'Annual.Salary'
 
 # Import datasets
-dataset <- try(data.frame(read.csv('data/clean_employee_sample_data.csv', 
-                                   sep=';')))
-alldata <- data_splitter(dataset, 0.8)
+dataset <- try(data.frame(read.csv('data/clean_employee_sample_data.csv', sep=';')))
+# dataset <- try(data.frame(read.csv('predictions_r/PseudoData.csv', sep=',')))
+alldata <- data_splitter(dataset, 0.7)
 trainers <- alldata[['trainers']]
 testers <- alldata[['testers']]
 
@@ -42,4 +42,4 @@ plot(trainResultsAssigned <- assign_results(trainers, use_models, trained_models
 plot(trainResultsMeandian <- combined_meandian(trainers, trainResultsAssigned))
 
 ################### MODEL REWORK ###################
-plot(final <- reworked_results(testers))
+plot(final <- reworked_results(dataset))
