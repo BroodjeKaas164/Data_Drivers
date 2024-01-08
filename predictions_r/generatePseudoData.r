@@ -1,8 +1,7 @@
 ################### IMPORT LIBRARIES ###################
 options(repos=c(CRAN="https://cloud.r-project.org"))
 
-dataset <- try(data.frame(read.csv('data/clean_employee_sample_data.csv', 
-                                   sep=';')))
+dataset <- try(data.frame(read.csv('data/clean_employee_sample_data.csv', sep=';')))
 dataset <- na.omit(dataset)
 
 ################### DEFINE PARAMETERS ###################
@@ -32,3 +31,4 @@ for (column_name in colnames(dataset)) {
   }
 }
 print(summary(new_data))
+write.csv(new_data, "predictions_r/PseudoData.csv", row.names=FALSE)
