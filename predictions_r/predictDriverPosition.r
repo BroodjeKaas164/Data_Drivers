@@ -6,24 +6,26 @@ source('predictions_r/sourceModelFunctions.r', chdir=TRUE)
 ################### DEFINE PARAMETERS ###################
 # SETTINGS
 set.seed(69)
-use_models <- c('qrf', 'lm', 'rf')
-optimise_model <- 'qrf'
+use_models <- c('qrf', 'rf')
+optimise_model <- 'glm'
 decimals <- 0 # -1 is unrounded
 p_factor <- 'positionOrder'
 
 # import datasets
-dataset <- try(data.frame(read.csv('data/clean_results.csv', 
-                                   sep=';')))
-alldata <- data_splitter(dataset, 0.8)
+dataset <- try(data.frame(read.csv('data/clean_results.csv', sep=';')))
+alldata <- data_splitter(dataset, 0.7)
 trainers <- alldata[['trainers']]
 testers <- alldata[['testers']]
+
+################### EXPORT MODELFUNCTIONS HERE FOR EXTERNAL USE ###################
+# @here
 
 ################### TRAIN MODELS ###################
 train_models <- function(models, trainData, model_dict=list()) {
   for (model in models) {
     model_name <- paste0('model_', model)
     print(model_name)
-    model <- try(train(positionOrder ~ points + grid, data=trainData, method=model))
+    model <- try(train(position ~ points + grid, data=trainData, method=model))
     try(model_dict[[model_name]] <- model)
     print(summary(model))
   }
@@ -32,13 +34,13 @@ train_models <- function(models, trainData, model_dict=list()) {
 trained_models <- train_models(use_models, trainers)
 
 ################### PREDICTION RESULTS ###################
-plot(trainResultsAssigned <- assign_results(trainers, use_models, trained_models))
+# plot(trainResultsAssigned <- assign_results(trainers, use_models, trained_models))
 
 ################### COMBINED MEANDIAN ###################
-plot(trainResultsMeandian <- combined_meandian(trainers, trainResultsAssigned))
+# plot(trainResultsMeandian <- combined_meandian(trainers, trainResultsAssigned))
 
 ################### MODEL REWORK ###################
-plot(final <- reworked_results(testers))
+plot(final <- reworked_results(dataset))
 
 ################### CONFUSION MATRIX ###################
 create_confusion_matrix(testers)
