@@ -12,6 +12,7 @@ Data/.DS_Store
 /getdata_python/**.csv
 /**.Rdata
 /predictions_r/**.rda
+/predictions_r/**.csv
 .Rhistory
 **.Rproj
 .Rproj.user
