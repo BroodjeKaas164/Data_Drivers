@@ -6,14 +6,14 @@ source('predictions_r/sourceModelFunctions.r', chdir=TRUE)
 ################### DEFINE PARAMETERS ###################
 # SETTINGS
 set.seed(69)
-use_models <- c('glm', 'glm.nb', 'Bstlm')
+use_models <- c('glm', 'glm.nb')
 optimise_model <- 'glm'
 decimals <- 0
 p_factor <- 'milliseconds'
 
 # Import datasets
 dataset <- try(data.frame(read.csv('data/clean_lap_times.csv', sep = ';')))
-alldata <- data_splitter(dataset, 0.8)
+alldata <- data_splitter(dataset, 0.6)
 trainers <- alldata[['trainers']]
 testers <- alldata[['testers']]
 
@@ -37,4 +37,9 @@ trained_models <- train_models(use_models, trainers)
 # plot(trainResultsMeandian <- combined_meandian(trainers, trainResultsAssigned))
 
 ################### MODEL REWORK ###################
-plot(final <- reworked_results(testers))
+# plot(final <- reworked_results(testers))
+
+datanew <- data.frame(dataset)
+final <- reworked_results(dataset)
+datanew[["pred_laptime"]] <- final$p_optimised
+write.csv(datanew, "predictions_r/pred_laptimes.csv", row.names=FALSE)

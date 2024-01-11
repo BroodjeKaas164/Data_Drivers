@@ -37,4 +37,9 @@ trained_models <- train_models(use_models, trainers)
 # plot(trainResultsMeandian <- combined_meandian(trainers, trainResultsAssigned))
 
 ################### MODEL REWORK ###################
-plot(final <- reworked_results(dataset))
+# plot(final <- reworked_results(dataset))
+
+datanew <- data.frame(dataset)
+final <- reworked_results(dataset)
+datanew[["pred_pos"]] <- final$p_optimised
+write.csv(datanew, "predictions_r/pred_constructor_standings.csv", row.names=FALSE)

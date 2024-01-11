@@ -94,3 +94,4 @@ trained_models <- train_models(use_models, set)
 datanew <- data.frame(dataset)
 test <- reworked_results(dataset)
 datanew[["pred_pos"]] <- test$p_optimised
+write.csv(datanew, "predictions_r/pred_results.csv", row.names=FALSE)
