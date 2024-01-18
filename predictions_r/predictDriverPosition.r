@@ -25,7 +25,7 @@ train_models <- function(models, trainData, model_dict=list()) {
   for (model in models) {
     model_name <- paste0('model_', model)
     print(model_name)
-    model <- try(train(positionOrder ~ points + grid, data=trainData, method=model))
+    model <- try(train(positionOrder ~ points + grid + driverId + raceId, data=trainData, method=model))
     try(model_dict[[model_name]] <- model)
     print(summary(model))
   }
@@ -45,7 +45,7 @@ trained_models <- train_models(use_models, trainers)
 datanew <- data.frame(dataset)
 final <- reworked_results(dataset)
 datanew[["pred_pos"]] <- final$p_optimised
-write.csv(datanew, "predictions_r/pred_results.csv", row.names=FALSE)
+write.csv(datanew, "predictions_r/pred_results.csv", row.names=FALSE, na="NA")
 
 ################### CONFUSION MATRIX ###################
 # create_confusion_matrix(testers)
