@@ -37,9 +37,9 @@ trained_models <- train_models(use_models, trainers)
 # plot(trainResultsMeandian <- combined_meandian(testers, trainResultsAssigned))
 
 ################### MODEL REWORK ###################
-# plot(final <- reworked_results(testers))
+plot(final <- reworked_results(testers))
 
-datanew <- data.frame(dataset)
-final <- reworked_results(dataset)
-datanew[["pred_laptime"]] <- final$p_optimised
-write.csv(datanew, "predictions_r/pred_laptimes.csv", row.names=FALSE, na="NA")
+# datanew <- data.frame(dataset)
+# final <- reworked_results(dataset)
+# datanew[["pred_laptime"]] <- final$p_optimised
+# write.csv(datanew, "predictions_r/pred_laptimes.csv", row.names=FALSE, na="NA")
